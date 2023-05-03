@@ -26,6 +26,8 @@ Because this is an experiment I couldn’t and didn’t want to implement a full
 
 I choose the 20 tiles as a limit because it seemed enough to display any role related lists, drilldowns and additional function shortcuts.
 
+<img width="790" alt="image" src="https://user-images.githubusercontent.com/64136814/236013723-a4ab416a-caa9-4c82-8fcb-9b339bb3e2a0.png">
+
 If this wouldn’t be enough it is easy to add more groups to the role centre page and to the configuration.
 
 Challenges
