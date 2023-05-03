@@ -102,6 +102,7 @@ codeunit 80102 "Easy Tile SVG Management"
         svgtext: Text;
     begin
         svgtext := EasyTileSVGHeader."Import SVG";
+        svgtext := EasyTileSVGHeader.GetImportSVG();
         NextLineNo := 10000;
         if svgtext = '' then exit;
 
@@ -268,6 +269,7 @@ codeunit 80102 "Easy Tile SVG Management"
                         HttpResponseMessage.Content.ReadAs(httpcontent);
                         if StrLen(httpcontent) < MaxStrLen(EasyTileSVGHeader."Import SVG") then
                             EasyTileSVGHeader."Import SVG" := httpcontent;
+                        EasyTileSVGHeader.SetImportSVG(httpcontent);
                         EasyTileSVGHeader.Modify(true);
                         Commit(); //:(
                         if not ReadSVG(EasyTileSVGHeader) then begin

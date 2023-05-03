@@ -119,4 +119,13 @@ page 80109 "Easy Tile SVG List"
         }
     }
 
+    trigger OnAfterGetRecord()
+    var
+        EasyTileSVGManagement: Codeunit "Easy Tile SVG Management";
+        svgtext: Text;
+    begin
+        svgtext := EasyTileSVGManagement.CreateSVG(Rec, true);
+        CurrPage.SVGPreview.ShowSvg(svgtext);
+        CurrPage.SVGPreview.svgDefToPng(svgtext, Rec.Code);
+    end;
 }

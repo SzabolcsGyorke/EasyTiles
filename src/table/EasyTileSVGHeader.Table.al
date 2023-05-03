@@ -55,9 +55,11 @@ table 80104 "Easy Tile SVG Header"
         }
 
         field(10; "Import SVG"; Text[2048])
+        field(10; "Import SVG"; Blob)
         {
             Caption = 'Import SVG';
             DataClassification = CustomerContent;
+            Subtype = Memo;
         }
 
         field(11; "Image"; Media)
@@ -94,6 +96,16 @@ table 80104 "Easy Tile SVG Header"
         {
         }
     }
+
+    internal procedure GetImportSVG(): Text
+    begin
+
+    end;
+
+    internal procedure SetImportSVG(NewImportSVG: Text)
+    begin
+
+    end;
 
     trigger OnDelete()
     var
