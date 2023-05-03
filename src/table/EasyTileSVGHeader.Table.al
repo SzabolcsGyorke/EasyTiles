@@ -54,7 +54,6 @@ table 80104 "Easy Tile SVG Header"
             DataClassification = CustomerContent;
         }
 
-        field(10; "Import SVG"; Text[2048])
         field(10; "Import SVG"; Blob)
         {
             Caption = 'Import SVG';
@@ -98,14 +97,25 @@ table 80104 "Easy Tile SVG Header"
     }
 
     internal procedure GetImportSVG(): Text
+    var
+        TypeHelper: Codeunit "Type Helper";
+        InStream: InStream;
     begin
-
+        CalcFields("Import SVG");
+        "Import SVG".CreateInStream(InStream, TEXTENCODING::UTF8);
+        exit(TypeHelper.TryReadAsTextWithSepAndFieldErrMsg(InStream, TypeHelper.LFSeparator(), FieldName("Import SVG")));
     end;
 
     internal procedure SetImportSVG(NewImportSVG: Text)
+    var
+        OutStream: OutStream;
     begin
-
+        Clear("Import SVG");
+        "Import SVG".CreateOutStream(OutStream, TEXTENCODING::UTF8);
+        OutStream.WriteText(NewImportSVG);
+        Modify();
     end;
+
 
     trigger OnDelete()
     var
