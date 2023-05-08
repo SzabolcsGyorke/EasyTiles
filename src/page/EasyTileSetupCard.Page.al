@@ -54,6 +54,7 @@ page 80105 "Easy Tile Setup Card"
                         begin
                             Rec.Calcfields("Table Name");
                             FilterPageBuilder.AddTable(Rec."Table Name", Rec."Table No.");
+                            TableFilter := Rec.GetTableFilter();
                             if TableFilter <> '' then
                                 FilterPageBuilder.SetView(Rec."Table Name", TableFilter);
                             if FilterPageBuilder.RunModal() then begin
