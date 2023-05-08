@@ -61,6 +61,7 @@ page 80110 "Easy Tile SVG Definition"
                         Rec.Image.ImportStream(InStr, Rec.Description, 'image/x-png');
 
                     end;
+
                 }
             }
             part("Main Style"; "Easy Tile SVG Main St. SubPage")
@@ -79,12 +80,15 @@ page 80110 "Easy Tile SVG Definition"
             {
                 Caption = 'Import';
 
-                field(svgintext; Rec."Import SVG")
+                field(svgintext; svgintext)
                 {
                     ApplicationArea = all;
                     ShowCaption = false;
                     MultiLine = true;
-
+                    trigger OnValidate()
+                    begin
+                        Rec.SetImportSVG(svgintext);
+                    end;
                 }
                 field(importfld; 'Import...')
                 {
@@ -142,11 +146,14 @@ page 80110 "Easy Tile SVG Definition"
     var
         EasyTileSVGManagement: Codeunit "Easy Tile SVG Management";
         SVGUpdated: Boolean;
+        svgintext: Text;
 
     trigger OnAfterGetRecord()
     begin
         SVGUpdated := false;
         UpdateSVG();
+        svgintext := '';
+        svgintext := Rec.GetImportSVG();
     end;
 
     local procedure UpdateSVG()

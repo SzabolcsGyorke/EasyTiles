@@ -22,6 +22,8 @@ pageextension 80102 "User Settings SG" extends "User Settings"
                         EasyTileGroupAssignment.Init();
                         EasyTileGroupAssignment."User Security Id" := UserSecurityId();
                         EasyTileGroupAssignment."Profile ID" := SessionSettings.ProfileId();
+                        EasyTileGroupAssignment.Insert();
+                        Commit();
                     end;
                     Page.RunModal(Page::"Easy Tile Group Assignments", EasyTileGroupAssignment);
                 end;

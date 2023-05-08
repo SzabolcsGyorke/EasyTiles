@@ -41,9 +41,27 @@ page 80105 "Easy Tile Setup Card"
                     {
                         ToolTip = 'Specifies the value of the Table Name field.';
                     }
-                    field("Table Filter"; Rec."Table Filter")
+                    field(TableFilterValue; TableFilter)
                     {
-                        ToolTip = 'Specifies the value of the Table Filter field.';
+                        ApplicationArea = Suite;
+                        Caption = 'Table Filter';
+                        ToolTip = 'Specifies the synchronization inclusion filter on the Business Central table.';
+                        Editable = false;
+
+                        trigger OnAssistEdit()
+                        var
+                            FilterPageBuilder: FilterPageBuilder;
+                        begin
+                            Rec.Calcfields("Table Name");
+                            FilterPageBuilder.AddTable(Rec."Table Name", Rec."Table No.");
+                            TableFilter := Rec.GetTableFilter();
+                            if TableFilter <> '' then
+                                FilterPageBuilder.SetView(Rec."Table Name", TableFilter);
+                            if FilterPageBuilder.RunModal() then begin
+                                TableFilter := FilterPageBuilder.GetView(Rec."Table Name", false);
+                                Rec.SetTableFilter(TableFilter);
+                            end;
+                        end;
                     }
                     field(Operation; Rec.Operation)
                     {
@@ -183,12 +201,18 @@ page 80105 "Easy Tile Setup Card"
         LowRangeStyleExpr: Text;
         MiddleRangeStyleExpr: Text;
         HighRangeStyleExpr: Text;
+        TableFilter: Text;
+        SetFilterTxt: Label 'Set Filter';
 
     trigger OnAfterGetRecord()
     begin
         LowRangeStyleExpr := EasyTileFunctions.ConvertStyleToStyleText(Rec."Low Range Style");
         MiddleRangeStyleExpr := EasyTileFunctions.ConvertStyleToStyleText(Rec."Middle Range Style");
         HighRangeStyleExpr := EasyTileFunctions.ConvertStyleToStyleText(Rec."High Range Style");
+
+        TableFilter := Rec.GetTableFilter();
+        if TableFilter = '' then
+            TableFilter := SetFilterTxt;
     end;
 
 
