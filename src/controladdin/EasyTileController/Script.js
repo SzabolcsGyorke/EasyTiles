@@ -1,8 +1,27 @@
-function InitializeControl(controlId) {
+//globals
+  const options = {
+    subtree: true,
+    attributes: true
+  }
+  
+  const observer = new MutationObserver(callback);
+
+  function callback(mutationList, observer) {
+    mutationList.forEach(function(mutation) {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+        console.log(mutation, observer);
+      }
+    })
+  }
+  
+ 
+
+  function InitializeControl(controlId) {
 }
 
+
 function FindAndSetTileGroup(elementid, caption, setfindcontrol) {
-    debugger;
+    
     nodes = window.parent.document.querySelectorAll(elementid); //find all controls by page name
    
     //find the control addin and set size - class="control-addin-container"
@@ -17,6 +36,8 @@ function FindAndSetTileGroup(elementid, caption, setfindcontrol) {
     nodes[nodes.length - 1].setAttribute('id',setfindcontrol); //so we can find the tilegroup later
     
     addinnode.setAttribute('style', 'height: 1px; max-height: 1px; width: 1px; max-width: 1px');
+    debugger;
+    observer.observe(addinnode, options);  //looking for changes 
 }
 
 function SetGroupCaption1(elementid,Caption1, Caption2){
@@ -87,7 +108,7 @@ function EditTile(elementid,groupid,tileid,removenumber,peektext,peektextstyle,t
 
             //remove the counter
             if (removenumber) {
-                debugger;
+                //debugger;
                 number = tile.querySelectorAll("span[class^='number-']");  //starts with number-
                 iconcontainer = number[0].parentNode;
                 number[0].remove(); //textContent = '';
@@ -133,3 +154,4 @@ function FindAndRemoveTileGroupNoMenuButton(elementid) {
     parentnodesx = parentnodes.parentNode;  //this should be the final node!?
     parentnodesx.remove();
 }
+

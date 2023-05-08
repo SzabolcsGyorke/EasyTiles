@@ -172,31 +172,33 @@ codeunit 80100 "Easy Tile Functions"
         if GetTileDefinition(TempEasyTileBuffer, TilePosition, EasyTileGroupLine) then
             if (EasyTileGroupLine."Table No." <> 0) then begin
                 recref.Open(EasyTileGroupLine."Table No.");
-                if Format(EasyTileGroupLine."Table Filter") <> '' then
-                    recref.SetView(TableFilter2View(Format(EasyTileGroupLine."Table Filter")));
+                if recref.ReadPermission() then begin
+                    if Format(EasyTileGroupLine."Table Filter") <> '' then
+                        recref.SetView(TableFilter2View(Format(EasyTileGroupLine."Table Filter")));
 
-                if not EasyTileGroupLine."Hide Counter" then
-                    case EasyTileGroupLine.Operation of
-                        EasyTileGroupLine.Operation::Count:
-                            RefValue := recref.Count();
-                        EasyTileGroupLine.Operation::Sum:
-                            if EasyTileGroupLine."Field No." <> 0 then begin
-                                fldref := recref.Field(EasyTileGroupLine."Field No.");
-                                if fldref.CalcSum() then
-                                    RefValue := fldref.Value;
-                            end;
-                    end;
+                    if not EasyTileGroupLine."Hide Counter" then
+                        case EasyTileGroupLine.Operation of
+                            EasyTileGroupLine.Operation::Count:
+                                RefValue := recref.Count();
+                            EasyTileGroupLine.Operation::Sum:
+                                if EasyTileGroupLine."Field No." <> 0 then begin
+                                    fldref := recref.Field(EasyTileGroupLine."Field No.");
+                                    if fldref.CalcSum() then
+                                        RefValue := fldref.Value;
+                                end;
+                        end;
 
 
-                //Style evaluation
-                if RefValue < EasyTileGroupLine."Threshold 1" then
-                    RefStyle := ConvertStyleToStyleText(EasyTileGroupLine."Low Range Style");
+                    //Style evaluation
+                    if RefValue < EasyTileGroupLine."Threshold 1" then
+                        RefStyle := ConvertStyleToStyleText(EasyTileGroupLine."Low Range Style");
 
-                if (RefValue >= EasyTileGroupLine."Threshold 1") and (RefValue <= EasyTileGroupLine."Threshold 2") then
-                    RefStyle := ConvertStyleToStyleText(EasyTileGroupLine."Middle Range Style");
+                    if (RefValue >= EasyTileGroupLine."Threshold 1") and (RefValue <= EasyTileGroupLine."Threshold 2") then
+                        RefStyle := ConvertStyleToStyleText(EasyTileGroupLine."Middle Range Style");
 
-                if RefValue > EasyTileGroupLine."Threshold 2" then
-                    RefStyle := ConvertStyleToStyleText(EasyTileGroupLine."High Range Style");
+                    if RefValue > EasyTileGroupLine."Threshold 2" then
+                        RefStyle := ConvertStyleToStyleText(EasyTileGroupLine."High Range Style");
+                end;
             end;
     end;
 
@@ -208,7 +210,12 @@ codeunit 80100 "Easy Tile Functions"
         recrefopen: Boolean;
         varrecref: Variant;
         ImportQst: Label 'Import ?';
+        IsHandled: Boolean;
     begin
+        OnBeforeOnclick(TempEasyTileBuffer, TilePosition, style, IsHandled);
+        if IsHandled then
+            exit;
+
         if GetTileDefinition(TempEasyTileBuffer, TilePosition, EasyTileGroupLine) then begin
             if TempEasyTileBuffer."Edit Mode" then begin
                 if Page.RunModal(Page::"Easy Tile Setup Card", EasyTileGroupLine) = Action::LookupOK then begin
@@ -453,6 +460,11 @@ codeunit 80100 "Easy Tile Functions"
 
     [IntegrationEvent(false, false)]
     local procedure OnAfterGenerateTileBuffer(UserId: Code[80]; TileGroupId: Integer; EditMode: Boolean; var TempEasyTileBuffer: Record "Easy Tile Buffer" temporary; var Caption: Text)
+    begin
+    end;
+
+    [IntegrationEvent(false, false)]
+    local procedure OnBeforeOnclick(var TempEasyTileBuffer: Record "Easy Tile Buffer" temporary; TilePosition: Integer; var style: Text; var IsHandled: Boolean)
     begin
     end;
 }
