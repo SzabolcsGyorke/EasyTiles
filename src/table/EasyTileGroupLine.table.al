@@ -134,22 +134,9 @@ table 80102 "Easy Tile Group Line"
             CalcFormula = lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table), "Object ID" = field("Table No.")));
             Editable = false;
         }
-        field(22; "Table Filter"; TableFilter)
+        field(22; "Table Filter"; BLOB)
         {
             Caption = 'Table Filter';
-            DataClassification = ToBeClassified;
-            trigger OnLookup()
-            var
-                PermissionPagesMgt: Codeunit "Permission Pages Mgt.";
-                FilterText: Text;
-            begin
-
-                // if Format("Table Filter") = '' then
-                //    exit;
-
-                if ShowTableFilters(FilterText, "Table No.", "Table Name", Format("Table Filter")) then
-                    Evaluate("Table Filter", FilterText);
-            end;
         }
 
         field(23; "Operation"; Option)
@@ -225,22 +212,21 @@ table 80102 "Easy Tile Group Line"
     }
 
 
-    local procedure ShowTableFilters(var FilterText: Text; ObjectID: Integer; ObjectName: Text; InputFilter: Text): Boolean
+    procedure SetTableFilter("Filter": Text)
     var
-        TableFilter: Record "Table Filter";
-        TableFilterPage: Page "Table Filter";
+        OutStream: OutStream;
     begin
-        TableFilter.FilterGroup(2);
-        TableFilter.SetRange("Table Number", ObjectID);
-        TableFilter.FilterGroup(0);
+        "Table Filter".CreateOutStream(OutStream);
+        OutStream.Write(Filter);
+    end;
 
-        TableFilterPage.SetTableView(TableFilter);
-        TableFilterPage.SetSourceTable(InputFilter, ObjectID, ObjectName);
-
-        if Action::OK = TableFilterPage.RunModal() then begin
-            FilterText := TableFilterPage.CreateTextTableFilter(false);
-            exit(true);
-        end;
+    procedure GetTableFilter() Value: Text
+    var
+        InStream: InStream;
+    begin
+        CalcFields("Table Filter");
+        "Table Filter".CreateInStream(InStream);
+        InStream.Read(Value);
     end;
 
     local procedure ValidateThresholds()

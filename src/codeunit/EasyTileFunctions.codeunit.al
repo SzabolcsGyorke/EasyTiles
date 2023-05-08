@@ -173,8 +173,8 @@ codeunit 80100 "Easy Tile Functions"
             if (EasyTileGroupLine."Table No." <> 0) then begin
                 recref.Open(EasyTileGroupLine."Table No.");
                 if recref.ReadPermission() then begin
-                    if Format(EasyTileGroupLine."Table Filter") <> '' then
-                        recref.SetView(TableFilter2View(Format(EasyTileGroupLine."Table Filter")));
+                    if EasyTileGroupLine.GetTableFilter() <> '' then
+                        recref.SetView(EasyTileGroupLine.GetTableFilter());
 
                     if not EasyTileGroupLine."Hide Counter" then
                         case EasyTileGroupLine.Operation of
@@ -229,8 +229,8 @@ codeunit 80100 "Easy Tile Functions"
             end else begin
                 if EasyTileGroupLine."Table No." <> 0 then begin
                     recref.Open(EasyTileGroupLine."Table No.");
-                    if Format(EasyTileGroupLine."Table Filter") <> '' then
-                        recref.SetView(TableFilter2View(Format(EasyTileGroupLine."Table Filter")));
+                    if EasyTileGroupLine.GetTableFilter() <> '' then
+                        recref.SetView(EasyTileGroupLine.GetTableFilter());
                     recrefopen := not recref.IsEmpty();
                     varrecref := recref;
                 end;
@@ -393,42 +393,6 @@ codeunit 80100 "Easy Tile Functions"
             EasyTileGroupLine.SetRange("User Security Id", UserSecurityId);
             page.RunModal(Page::"Easy Tile Group Lines", EasyTileGroupLine);
         end;
-    end;
-
-    procedure TableFilter2View(TableFilter: Text) View: Text
-    // TableFilter format:
-    // <TableName>:<FieldCaption>=<FieldFilter>,<FieldCaption>=<FieldFilter>,..
-    // View format:
-    // [SORTING(<Key>)] WHERE(<FieldCaption>=FILTER(<FieldFilter>),<FieldCaption>=FILTER(<FieldFilter>),...)
-    var
-        CharNo: Integer;
-    begin
-        IF TableFilter = '' then
-            exit('');
-
-        View := 'WHERE(';
-
-        for CharNo := StrPos(TableFilter, ':') + 1 TO StrLen(TableFilter) do begin
-            CASE TableFilter[CharNo] OF
-                '=':
-                    View := View + '=filter(';
-                ',':
-                    View := View + '),';
-                '"':
-                    begin
-                        CharNo := CharNo + 1;
-                        repeat
-                            View := View + Format(TableFilter[CharNo]);
-                            CharNo := CharNo + 1;
-                        until TableFilter[CharNo] = '"';
-                        CharNo := CharNo + 1;
-                    end;
-                else
-                    View := View + Format(TableFilter[CharNo]);
-            end;
-        end;
-
-        View := View + '))';
     end;
 
     procedure ConvertStyleToStyleText(Style: Enum "Cues And KPIs Style"): Text
