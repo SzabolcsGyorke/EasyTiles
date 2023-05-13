@@ -13,7 +13,9 @@
       }
     })
   }
-  
+  //debugger;
+    //observer.observe(addinnode, options);  //looking for changes 
+
  
 
   function InitializeControl(controlId) {
@@ -21,12 +23,10 @@
 
 
 function FindAndSetTileGroup(elementid, caption, setfindcontrol) {
-    
     nodes = window.parent.document.querySelectorAll(elementid); //find all controls by page name
    
     //find the control addin and set size - class="control-addin-container"
     parentnodes = nodes[nodes.length - 1].offsetParent;
-    
     parentnodes = parentnodes.querySelectorAll('[class="control-addin-container"]');
     addinnode = parentnodes[0].childNodes[0];
 
@@ -36,8 +36,6 @@ function FindAndSetTileGroup(elementid, caption, setfindcontrol) {
     nodes[nodes.length - 1].setAttribute('id',setfindcontrol); //so we can find the tilegroup later
     
     addinnode.setAttribute('style', 'height: 1px; max-height: 1px; width: 1px; max-width: 1px');
-    debugger;
-    observer.observe(addinnode, options);  //looking for changes 
 }
 
 function SetGroupCaption1(elementid,Caption1, Caption2){
@@ -146,6 +144,7 @@ function FindAndRemoveTileGroup(elementid) {
     parentnodes = nodes[nodes.length - 1].offsetParent;
     parentnodes.remove();
 }
+
 function FindAndRemoveTileGroupNoMenuButton(elementid) {
     nodes = window.parent.document.querySelectorAll(elementid); //find all controls by page name
     parentnodes = nodes[nodes.length - 1].parentNode;
