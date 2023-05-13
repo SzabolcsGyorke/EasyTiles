@@ -231,7 +231,7 @@ codeunit 80100 "Easy Tile Functions"
                     recref.Open(EasyTileGroupLine."Table No.");
                     if EasyTileGroupLine.GetTableFilter() <> '' then
                         recref.SetView(EasyTileGroupLine.GetTableFilter());
-                    recrefopen := not recref.IsEmpty();
+                    recrefopen := recref.FindFirst();
                     varrecref := recref;
                 end;
 
