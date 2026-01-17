@@ -63,15 +63,34 @@ page 80105 "Easy Tile Setup Card"
                             end;
                         end;
                     }
+                    field("Selected Key"; Rec."Selected Key")
+                    {
+                        ToolTip = 'Specifies the value of the Selected Key field.', Comment = '%';
+                        Editable = false;
+                        trigger OnAssistEdit()
+                        begin
+                            Rec.Validate("Selected Key Index", Rec.SelectKey());
+                            CurrPage.Update(true);
+                        end;
+                    }
+                    field("Descending Order"; Rec."Descending Order")
+                    {
+                        ToolTip = 'Specifies the value of the Descending Order field.', Comment = '%';
+                    }
+
                     field(Operation; Rec.Operation)
                     {
                         ToolTip = 'Specifies the value of the Operation field.';
                     }
-                    field("Field No."; Rec."Field No.")
+                    field("Field Name"; Rec."Field Name")
                     {
-                        Visible = (Rec.Operation <> rec.Operation::Count);
-                        ToolTip = 'Specifies the value of the Field No. field.';
-                        LookupPageId = "Fields Lookup";
+                        ToolTip = 'Specifies the value of the Field Name field.', Comment = '%';
+                        Editable = false;
+                        trigger OnAssistEdit()
+                        begin
+                            Rec.Validate("Field No.", Rec.SelectField());
+                            CurrPage.Update(true);
+                        end;
                     }
 
                 }
@@ -125,6 +144,7 @@ page 80105 "Easy Tile Setup Card"
                     begin
                         CurrPage.SaveRecord();
                         EasyTilecolourPicker.InitColour(Rec."Tile Background Colour");
+                        Commit();
                         EasyTilecolourPicker.RunModal();
                         if EasyTilecolourPicker.IsColourChanged() then begin
                             Rec."Tile Background Colour" := EasyTilecolourPicker.GetColour();
@@ -137,7 +157,7 @@ page 80105 "Easy Tile Setup Card"
                 field("Tile Font Colour"; Rec."Tile Font Colour")
                 {
                     ToolTip = 'Specifies the value of the Tile Font Colour field.';
-                    Visible = false;  //TODO: make this work 
+                    //Visible = false;  //TODO: make this work 
                     trigger OnAssistEdit()
                     var
                         EasyTilecolourPicker: Page "Easy Tile colour Picker";

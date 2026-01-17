@@ -47,6 +47,12 @@ table 80101 "Easy Tile Group"
             Caption = 'Group 4 Caption';
             DataClassification = CustomerContent;
         }
+        field(9; "Auto Refresh Interval"; Integer)
+        {
+            Caption = 'Auto Refresh Interval';
+            DataClassification = CustomerContent;
+        }
+
     }
     keys
     {

@@ -225,8 +225,8 @@ codeunit 80102 "Easy Tile SVG Management"
 
             until JsonBuffer.Next() < 1;
 
-
-        Page.RunModal(Page::"Easy Tile SVG Tag Selector", TempEasyTileSVGTag);
+        commit;
+        if Page.RunModal(Page::"Easy Tile SVG Tag Selector", TempEasyTileSVGTag) = Action::OK then;
         TempEasyTileSVGTag.SetRange(Selected, true);
         if TempEasyTileSVGTag.Count > 0 then begin
             JsonBufferIcons.Copy(JsonBuffer, true);

@@ -170,6 +170,15 @@ table 80100 "Easy Tile Buffer"
             FieldClass = FlowFilter;
             TableRelation = "Easy Tile Group";
         }
+        field(667; "Move Mode"; Boolean)
+        {
+            Caption = 'Move Mode';
+        }
+        field(668; "Tile To Move"; Integer)
+        {
+            Caption = 'Tile To Move';
+        }
+
     }
     keys
     {

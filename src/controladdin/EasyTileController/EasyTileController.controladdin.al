@@ -19,4 +19,6 @@ controladdin "Easy Tile Controller"
     procedure SetGroupCaption2(elementid: Text; Caption1: Text; Caption2: Text; Caption3: Text; Caption4: Text)
 
     procedure EditTile(elementid: Text; groupid: integer; tileid: integer; removenumber: Boolean; peektext: Text; peektextstyle: Text; tilebackground: text; tilefontcolor: text; iconsvg: Text)
+
+
 }

@@ -81,13 +81,27 @@ table 80102 "Easy Tile Group Line"
             trigger OnLookup()
             var
                 AllObjWithCaption: Record AllObjWithCaption;
+                PageMetadata: Record "Page Metadata";
             begin
 
                 case "Object Type" of
                     "Object Type"::Codeunit:
                         AllObjWithCaption.SetRange(AllObjWithCaption."Object Type", AllObjWithCaption."Object Type"::Codeunit);
                     "Object Type"::Page:
-                        AllObjWithCaption.SetRange(AllObjWithCaption."Object Type", AllObjWithCaption."Object Type"::Page);
+                        begin
+                            AllObjWithCaption.SetRange(AllObjWithCaption."Object Type", AllObjWithCaption."Object Type"::Page);
+                            if "Table No." <> 0 then begin
+                                PageMetadata.SetRange(SourceTable, "Table No.");
+                                if PageMetadata.FindSet() then begin
+                                    repeat
+                                        AllObjWithCaption.Get(AllObjWithCaption."Object Type"::Page, PageMetadata.ID);
+                                        AllObjWithCaption.Mark(true);
+                                    until PageMetadata.Next() < 1;
+                                    AllObjWithCaption.MarkedOnly(true);
+                                end;
+                            end;
+
+                        end;
                     "Object Type"::Report:
                         AllObjWithCaption.SetRange(AllObjWithCaption."Object Type", AllObjWithCaption."Object Type"::Report);
                     "Object Type"::"XML Port":
@@ -119,10 +133,11 @@ table 80102 "Easy Tile Group Line"
                 FoundPageID: Integer;
             begin
                 if "Table No." <> xRec."Table No." then begin
+                    "Selected Key Index" := 1;
                     FoundPageID := ConfigMgt.FindPage("Table No.");
                     if FoundPageID <> 0 then begin
                         "Object Type" := "Object Type"::Page;
-                        "Object Id" := FoundPageID;
+                        Validate("Object Id", FoundPageID);
                     end;
                 end;
             end;
@@ -202,6 +217,65 @@ table 80102 "Easy Tile Group Line"
             Caption = 'High Range Style', Comment = 'The Style to use if the cue''s value is above Threshold 2';
         }
 
+        field(35; "LR Background Colour"; Text[50])
+        {
+            Caption = 'Low Range Custom Background Colour';
+            DataClassification = CustomerContent;
+        }
+        field(36; "LR Tile Font Colour"; Text[50])
+        {
+            Caption = 'Low Range Custom Font Colour';
+            DataClassification = CustomerContent;
+        }
+        field(37; "MR Background Colour"; Text[50])
+        {
+            Caption = 'Middle Range Custom Background Colour';
+            DataClassification = CustomerContent;
+        }
+        field(38; "MR Tile Font Colour"; Text[50])
+        {
+            Caption = 'Middle Range Custom Font Colour';
+            DataClassification = CustomerContent;
+        }
+        field(39; "HR Background Colour"; Text[50])
+        {
+            Caption = 'High Range Custom Background Colour';
+            DataClassification = CustomerContent;
+        }
+        field(40; "HR Tile Font Colour"; Text[50])
+        {
+            Caption = 'High Range Custom Font Colour';
+            DataClassification = CustomerContent;
+        }
+
+        field(50; "Selected Key Index"; Integer)
+        {
+            Caption = 'Selected Key Index';
+            DataClassification = CustomerContent;
+            TableRelation = "Key"."No." where(TableNo = field("Table No."));
+        }
+        field(51; "Selected Key"; Text[1024])
+        {
+            Caption = 'Selected Key';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = lookup(Key."Key" where(TableNo = field("Table No."), "No." = field("Selected Key Index")));
+        }
+        field(52; "Field Name"; Text[80])
+        {
+            Caption = 'Field Name';
+            Editable = false;
+            FieldClass = FlowField;
+            CalcFormula = lookup(Field."Field Caption" where(TableNo = field("Table No."), "No." = field("Field No.")));
+        }
+        field(53; "Descending Order"; Boolean)
+        {
+            Caption = 'Descending Order';
+            DataClassification = CustomerContent;
+        }
+
+
+
     }
     keys
     {
@@ -233,10 +307,36 @@ table 80102 "Easy Tile Group Line"
     var
         WrongThresholdsErr: Label '%1 must be greater than %2.', Comment = '%1 Upper threshold %2 Lower threshold';
     begin
-        if "Threshold 2" <= "Threshold 1" then
+        if ("Threshold 2" <= "Threshold 1") and ("Threshold 1" <> 0) then
             Error(
               WrongThresholdsErr,
               FieldCaption("Threshold 2"),
               FieldCaption("Threshold 1"));
+    end;
+
+    internal procedure SelectKey(): Integer
+    var
+        "Key": Record "Key";
+    begin
+        "Key".SetRange(TableNo, Rec."Table No.");
+        "Key".SetRange(Enabled, true);
+
+        if Page.RunModal(Page::"Easy Tile Select Key", "Key") = Action::LookupOK then
+            exit("Key"."No.")
+        else
+            exit(Rec."Selected Key Index");
+    end;
+
+    internal procedure SelectField(): Integer
+    var
+        Field: Record Field;
+    begin
+        Field.SetRange(TableNo, Rec."Table No.");
+        Field.SetRange(ObsoleteState, Field.ObsoleteState::No);
+        Field.SetFilter(Type, '%1|%2', Field.Type::Integer, Field.Type::Decimal);
+        if Page.RunModal(Page::"Fields Lookup", Field) = Action::LookupOK then
+            exit(Field."No.")
+        else
+            exit("Field No.");
     end;
 }

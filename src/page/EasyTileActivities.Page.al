@@ -5,7 +5,11 @@ page 80101 "Easy Tile Activities"
     PageType = CardPart;
     SourceTable = "Easy Tile Buffer";
     SourceTableTemporary = true;
+    InsertAllowed = false;
+    DeleteAllowed = false;
     DataCaptionFields = "Tile Group Code";
+    AboutTitle = 'Edit Tiles';
+    AboutText = 'This screen helps to ocreate new, modify move or delete tiles from the group. Groups can be sized as 2x10 or 4x5. Each group can have maximum 20 tiles.';
     layout
     {
         area(content)
@@ -19,11 +23,18 @@ page 80101 "Easy Tile Activities"
                 {
                     CaptionClass = Rec."Caption 1";
                     Visible = Visible1;
+
                     StyleExpr = Style1;
                     DecimalPlaces = 0 : 2;
                     trigger OnDrillDown()
                     begin
+                        if TimerEnabled then
+                            CurrPage.TimerControl.StopTimer();
+
                         EasyTileFunctions.OnClick(Rec, 1, Style1);
+
+                        if TimerEnabled then
+                            CurrPage.TimerControl.StartTimer(TimerInterval);
                     end;
                 }
 
@@ -505,12 +516,33 @@ page 80101 "Easy Tile Activities"
                         CurrPage.TileController.SetGroupCaption1(controlid, Rec."Group 1 Caption", Rec."Group 2 Caption")
                     else
                         CurrPage.TileController.SetGroupCaption2(controlid, Rec."Group 1 Caption", Rec."Group 2 Caption", rec."Group 3 Caption", rec."Group 4 Caption");
+
+
                     UpdateVariables();
                 end;
-
             }
 
+            usercontrol(TimerControl; TimerControl)
+            {
+                ApplicationArea = all;
+                trigger OnControlAddinReady()
+                var
+                    EasyTileGroup: Record "Easy Tile Group";
+                begin
+                    if not EditMode then
+                        if EasyTileGroup.Get(Rec."Tile Group Code") then
+                            if EasyTileGroup."Auto Refresh Interval" > 0 then begin
+                                CurrPage.TimerControl.StartTimer(EasyTileGroup."Auto Refresh Interval" * 1000);
+                                TimerEnabled := true;
+                                TimerInterval := EasyTileGroup."Auto Refresh Interval" * 1000;
+                            end;
+                end;
 
+                trigger OnTimer()
+                begin
+                    UpdatePage();
+                end;
+            }
         }
 
     }
@@ -524,7 +556,7 @@ page 80101 "Easy Tile Activities"
                 Image = Refresh;
                 trigger OnAction()
                 begin
-                    UpdatPage();
+                    UpdatePage();
                 end;
             }
             action(Edit)
@@ -536,8 +568,124 @@ page 80101 "Easy Tile Activities"
                 var
                     EasyTileFunctions: Codeunit "Easy Tile Functions";
                 begin
-                    EasyTileFunctions.EditGroupDefintion(Rec."Tile Group Code", true);
-                    UpdatPage();
+                    EasyTileFunctions.EditGroupDefinition(Rec."Tile Group Code", true);
+                    UpdatePage();
+                end;
+            }
+            action(StartTimer)
+            {
+                Caption = 'Start Timer';
+                Image = Start;
+                Enabled = not EditMode;
+                Visible = false;
+                trigger OnAction()
+                begin
+                    CurrPage.TimerControl.StartTimer(10000);
+                end;
+            }
+            action(StopTimer)
+            {
+                Caption = 'Stop Timer';
+                Image = Stop;
+                Enabled = not EditMode;
+                Visible = false;
+                trigger OnAction()
+                begin
+                    CurrPage.TimerControl.StopTimer();
+                    ;
+                end;
+            }
+            action(MoveMode)
+            {
+                ApplicationArea = all;
+                Caption = 'Toggle Move Mode';
+                ToolTip = 'Activates / deactivates move mode. Click on a tile and move left and right. When finished toggle the move mode and return to edit.';
+                Visible = EditMode;
+                Image = Dimensions;
+                trigger OnAction()
+                begin
+                    Rec."Move Mode" := not Rec."Move Mode";
+                    Rec."Tile To Move" := 0;
+                    UpdatePage();
+                end;
+
+            }
+            action(MoveLeft)
+            {
+                ApplicationArea = all;
+                Caption = 'Move Left';
+                ToolTip = 'Moves the tile to the left in the group';
+                Image = Insert;
+                Visible = Rec."Move Mode";
+                trigger OnAction()
+                begin
+                    if Rec."Tile To Move" > 1 then
+                        MoveTile(-1);
+                    // if layout = layout::"2x10" then
+                    //     case true of
+                    //         Rec."Tile To Move" <= 10:
+                    //             if Rec."Tile To Move" > 1 then
+                    //                 MoveTile(-1);
+                    //         (Rec."Tile To Move" > 10) and (Rec."Tile To Move" <= 20):
+                    //             if Rec."Tile To Move" > 10 then
+                    //                 MoveTile(-1);
+                    //     end;
+
+                    // if layout = layout::"4x5" then
+                    //     case true of
+                    //         Rec."Tile To Move" <= 5:
+                    //             if Rec."Tile To Move" > 1 then
+                    //                 MoveTile(-1);
+                    //         (Rec."Tile To Move" > 5) and (Rec."Tile To Move" <= 10):
+                    //             if Rec."Tile To Move" > 5 then
+                    //                 MoveTile(-1);
+                    //         (Rec."Tile To Move" > 10) and (Rec."Tile To Move" <= 15):
+                    //             if Rec."Tile To Move" > 10 then
+                    //                 MoveTile(-1);
+                    //         (Rec."Tile To Move" > 15) and (Rec."Tile To Move" <= 20):
+                    //             if Rec."Tile To Move" > 15 then
+                    //                 MoveTile(-1);
+                    //     end;
+                end;
+            }
+            action(MoveRight)
+            {
+                ApplicationArea = all;
+                Caption = 'Move Right';
+                ToolTip = 'Moves the tile right in the group';
+                Image = GoTo;
+                Visible = Rec."Move Mode";
+                trigger OnAction()
+                begin
+                    if Rec."Tile To Move" < 20 then
+                        MoveTile(1);
+
+                    // if layout = layout::"2x10" then
+                    //     case true of
+                    //         Rec."Tile To Move" <= 10:
+                    //             if Rec."Tile To Move" < 10 then
+                    //                 MoveTile(1);
+                    //         (Rec."Tile To Move" > 10) and (Rec."Tile To Move" <= 20):
+                    //             if Rec."Tile To Move" < 20 then
+                    //                 MoveTile(1);
+                    //     end;
+
+                    // if layout = layout::"4x5" then
+                    //     case true of
+                    //         Rec."Tile To Move" <= 5:
+                    //             if Rec."Tile To Move" < 5 then
+                    //                 MoveTile(1);
+                    //         (Rec."Tile To Move" > 5) and (Rec."Tile To Move" <= 10):
+                    //             if Rec."Tile To Move" < 10 then
+                    //                 MoveTile(1);
+                    //         (Rec."Tile To Move" > 10) and (Rec."Tile To Move" <= 15):
+                    //             if Rec."Tile To Move" < 15 then
+                    //                 MoveTile(1);
+                    //         (Rec."Tile To Move" > 15) and (Rec."Tile To Move" <= 20):
+                    //             if Rec."Tile To Move" < 20 then
+                    //                 MoveTile(1);
+                    //     end;
+
                 end;
             }
         }
@@ -547,6 +695,7 @@ page 80101 "Easy Tile Activities"
         lbl_tb: Label 'TileBrickProducts';
         EasyTileFunctions: Codeunit "Easy Tile Functions";
         [InDataSet]
+        TimerEnabled: Boolean;
         Visible0: Boolean;
         [InDataSet]
         Visible1: Boolean;
@@ -642,6 +791,7 @@ page 80101 "Easy Tile Activities"
         EditSearchControl: Label '[controlname="Easy Tile Activities"]', Locked = true;
         [indataset]
         EditMode: Boolean;
+        TimerInterval: Decimal;
 
 
     trigger OnOpenPage()
@@ -673,16 +823,51 @@ page 80101 "Easy Tile Activities"
         Visible0 := (layout = layout::"2x10");
     end;
 
+    local procedure MoveTile(Direction: Integer)
+    var
+        EasyTileGroupLine: Record "Easy Tile Group Line";
+        MEasyTileGroupLine: Record "Easy Tile Group Line";
+        TempEasyTileGroupLine: Record "Easy Tile Group Line" temporary;
+        EmptyGuid: Guid;
+    begin
+        EasyTileGroupLine.Get(Rec."Tile Group Code", Rec."Tile To Move", EmptyGuid);
+        EasyTileGroupLine.CalcFields("Table Filter");
+        TempEasyTileGroupLine.Init();
+        TempEasyTileGroupLine := EasyTileGroupLine;
+        TempEasyTileGroupLine.Insert();
+
+        MEasyTileGroupLine.Get(Rec."Tile Group Code", Rec."Tile To Move" + Direction, EmptyGuid);
+        MEasyTileGroupLine.CalcFields("Table Filter");
+        EasyTileGroupLine.Delete();
+        EasyTileGroupLine.Init();
+        EasyTileGroupLine := MEasyTileGroupLine;
+        EasyTileGroupLine."Tile Position" := Rec."Tile To Move";
+        EasyTileGroupLine.Insert();
+
+        MEasyTileGroupLine.Delete();
+        MEasyTileGroupLine.Init();
+        MEasyTileGroupLine := TempEasyTileGroupLine;
+        MEasyTileGroupLine."Tile Position" := Rec."Tile To Move" + Direction;
+        MEasyTileGroupLine.Insert();
+
+        Rec."Tile To Move" += Direction;
+        Rec.Modify();
+        UpdatePage();
+    end;
+
 
     local procedure SetValue(Value1: Decimal): Integer
     begin
         exit(round(Value1, 1));
     end;
 
-    local procedure UpdatPage()
+    local procedure UpdatePage()
     var
         xEasyTileBuffer: Record "Easy Tile Buffer";
     begin
+        if TimerEnabled then
+            CurrPage.TimerControl.StopTimer();
+
         xEasyTileBuffer := Rec;
         Rec.Delete();
         Rec.Init();
@@ -690,10 +875,10 @@ page 80101 "Easy Tile Activities"
         Rec."Tile Group Position" := xEasyTileBuffer."Tile Group Position";
         Rec."Edit Mode" := xEasyTileBuffer."Edit Mode";
         Rec."Preview Mode" := xEasyTileBuffer."Preview Mode";
+        Rec."Move Mode" := xEasyTileBuffer."Move Mode";
+        Rec."Tile To Move" := xEasyTileBuffer."Tile To Move";
 
         EasyTileFunctions.GenerateTileBuffer(UserId(), Rec, GroupCaption, layout);
-
-
 
         if layout = layout::"2x10" then
             CurrPage.TileController.SetGroupCaption1(controlid, Rec."Group 1 Caption", Rec."Group 2 Caption")
@@ -701,6 +886,9 @@ page 80101 "Easy Tile Activities"
             CurrPage.TileController.SetGroupCaption2(controlid, Rec."Group 1 Caption", Rec."Group 2 Caption", rec."Group 3 Caption", rec."Group 4 Caption");
         UpdateVariables();
         CurrPage.Update(true);
+
+        if TimerEnabled then
+            CurrPage.TimerControl.StartTimer(TimerInterval);
     end;
 
     local procedure UpdateVariables()

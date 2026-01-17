@@ -95,7 +95,8 @@ function EditTile(elementid,groupid,tileid,removenumber,peektext,peektextstyle,t
             //change tile colour
             tilestyle = tile.querySelector('div div div a'); //path to the tile <a>
             if (tilebackground != '' && tilefontcolor != ''){
-                tilestyle.setAttribute('style', 'background:'+tilebackground+' !important', 'color:'+tilefontcolor+' !important');
+                tilestyle.setAttribute('style', 'color:'+tilefontcolor+' !important; '+'background:'+tilebackground+' !important');
+                
             }
             if (tilebackground != ''&& tilefontcolor == ''){
                 tilestyle.setAttribute('style', 'background:'+tilebackground+' !important');
