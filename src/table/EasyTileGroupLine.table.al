@@ -134,6 +134,8 @@ table 80102 "Easy Tile Group Line"
             begin
                 if "Table No." <> xRec."Table No." then begin
                     "Selected Key Index" := 1;
+                    Operation := Operation::Count;
+                    ClearTableFilter();
                     FoundPageID := ConfigMgt.FindPage("Table No.");
                     if FoundPageID <> 0 then begin
                         "Object Type" := "Object Type"::Page;
@@ -153,36 +155,41 @@ table 80102 "Easy Tile Group Line"
         {
             Caption = 'Table Filter';
         }
+        field(23; "Filter Guid"; Guid)
+        {
+            Caption = 'Filter Guid';
+            Editable = false;
+        }
 
-        field(23; "Operation"; Option)
+        field(24; "Operation"; Option)
         {
             Caption = 'Operation';
             OptionMembers = ,Count,Sum;
             OptionCaption = ' ,Count,Sum';
             DataClassification = CustomerContent;
         }
-        field(24; "Field No."; Integer)
+        field(25; "Field No."; Integer)
         {
             Caption = 'Field No.';
             DataClassification = CustomerContent;
             TableRelation = Field."No." where(TableNo = field("Table No."));
         }
-        field(25; "Hide Counter"; Boolean)
+        field(26; "Hide Counter"; Boolean)
         {
             Caption = 'Hide Counter';
             DataClassification = CustomerContent;
         }
-        field(26; "Tile Background Colour"; Text[50])
+        field(27; "Tile Background Colour"; Text[50])
         {
             Caption = 'Tile Background Colour';
             DataClassification = CustomerContent;
         }
-        field(27; "Tile Font Colour"; Text[50])
+        field(28; "Tile Font Colour"; Text[50])
         {
             Caption = 'Tile Font Colour';
             DataClassification = CustomerContent;
         }
-        field(28; "Icon SVG Code"; Code[100])
+        field(29; "Icon SVG Code"; Code[100])
         {
             DataClassification = CustomerContent;
             Caption = 'Icon SVG Code';
@@ -285,6 +292,13 @@ table 80102 "Easy Tile Group Line"
         }
     }
 
+    trigger OnDelete()
+    var
+        EasyTileTableFilter: Record "Easy Tile Table Filter";
+    begin
+        EasyTileTableFilter.SetRange("Filter Id", "Filter Guid");
+        EasyTileTableFilter.DeleteAll();
+    end;
 
     procedure SetTableFilter("Filter": Text)
     var
@@ -312,6 +326,18 @@ table 80102 "Easy Tile Group Line"
               WrongThresholdsErr,
               FieldCaption("Threshold 2"),
               FieldCaption("Threshold 1"));
+    end;
+
+    local procedure ClearTableFilter()
+    var
+        EasyTileTableFilter: Record "Easy Tile Table Filter";
+    begin
+        if IsNullGuid("Filter Guid") then
+            "Filter Guid" := CreateGuid()
+        else begin
+            EasyTileTableFilter.SetRange("Filter Id", "Filter Guid");
+            EasyTileTableFilter.DeleteAll();
+        end;
     end;
 
     internal procedure SelectKey(): Integer

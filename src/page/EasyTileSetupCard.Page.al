@@ -41,6 +41,28 @@ page 80105 "Easy Tile Setup Card"
                     {
                         ToolTip = 'Specifies the value of the Table Name field.';
                     }
+                    // field(TableFilterValue; TableFilter)
+                    // {
+                    //     ApplicationArea = Suite;
+                    //     Caption = 'Table Filter';
+                    //     ToolTip = 'Specifies the synchronization inclusion filter on the Business Central table.';
+                    //     Editable = false;
+
+                    //     trigger OnAssistEdit()
+                    //     var
+                    //         FilterPageBuilder: FilterPageBuilder;
+                    //     begin
+                    //         Rec.Calcfields("Table Name");
+                    //         FilterPageBuilder.AddTable(Rec."Table Name", Rec."Table No.");
+                    //         TableFilter := Rec.GetTableFilter();
+                    //         if TableFilter <> '' then
+                    //             FilterPageBuilder.SetView(Rec."Table Name", TableFilter);
+                    //         if FilterPageBuilder.RunModal() then begin
+                    //             TableFilter := FilterPageBuilder.GetView(Rec."Table Name", false);
+                    //             Rec.SetTableFilter(TableFilter);
+                    //         end;
+                    //     end;
+                    // }
                     field(TableFilterValue; TableFilter)
                     {
                         ApplicationArea = Suite;
@@ -50,17 +72,26 @@ page 80105 "Easy Tile Setup Card"
 
                         trigger OnAssistEdit()
                         var
-                            FilterPageBuilder: FilterPageBuilder;
+                            WFTableFilter: Record "Easy Tile Table Filter";
+                            WFTableFilter2: Page "Easy Tile Table Filter";
                         begin
-                            Rec.Calcfields("Table Name");
-                            FilterPageBuilder.AddTable(Rec."Table Name", Rec."Table No.");
-                            TableFilter := Rec.GetTableFilter();
-                            if TableFilter <> '' then
-                                FilterPageBuilder.SetView(Rec."Table Name", TableFilter);
-                            if FilterPageBuilder.RunModal() then begin
-                                TableFilter := FilterPageBuilder.GetView(Rec."Table Name", false);
-                                Rec.SetTableFilter(TableFilter);
+                            WFTableFilter.SetRange("Filter Id", Rec."Filter Guid");
+                            WFTableFilter.SetRange("Table Number", Rec."Table No.");
+                            if not WFTableFilter.FindFirst() then begin
+                                WFTableFilter.Init();
+                                WFTableFilter."Filter Id" := Rec."Filter Guid";
+                                WFTableFilter."Table Number" := Rec."Table No.";
+                                WFTableFilter."Filter Table No." := 0;
+                                //WFTableFilter.Insert();
                             end;
+
+                            WFTableFilter2.SetTableView(WFTableFilter);
+                            //WFTableFilter2.SetRecord(WFTableFilter);
+                            WFTableFilter2.SetFilterTableAndField(Rec."Table No.", 0);
+                            WFTableFilter2.RunModal();
+
+                            TableFilter := WFTableFilter2.CreateTextTableFilterWithoutTableName(false);
+                            Rec.SetTableFilter(TableFilter);
                         end;
                     }
                     field("Selected Key"; Rec."Selected Key")

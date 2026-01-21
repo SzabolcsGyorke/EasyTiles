@@ -1,95 +1,182 @@
 codeunit 80103 "Easy Tiles Filter Mgt.SG"
 {
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Filter Tokens", 'OnResolveDateFilterToken', '', false, false)]
-    local procedure AddEIDateFilters(DateToken: Text; var FromDate: Date; var ToDate: Date; var Handled: Boolean)
     var
-        StartDate: Date;
-        EndDate: Date;
+        TempChangedFieldsGlobal: Record "Name/Value Buffer" temporary;
+        TodayTxt: Label '%TODAY';
+        WorkDateTxt: Label '%WORKDATE';
+        CurrentDateTimeTxt: Label '%CURRENTDATETIME';
+        NowTxt: Label '%NOW';
+        UserIdTxt: Label '%USERID';
+        UserSIDTxt: Label '%USERSID';
+        DFText: Label '%DATEFORMULA';
+
+    internal procedure FieldValueLookup(Tableno: Integer; FieldNo: Integer; xValue: Text): Text
+    var
+        Field: Record Field;
+        TempNameValueBuffer: Record "Name/Value Buffer" temporary;
+        RecRef: RecordRef;
+        KeyRef: KeyRef;
+        AddVirtualFieldTxt: Label 'Virtual Field: %1', Comment = '%1 field caption';
+        BooleanNoTxt: label 'No';
+        BooleanYesTxt: label 'Yes';
+        DateFormulaTxt: Label '%DATEFORMULA[%1,%2]', Comment = '%1 - Formula %2 - Date', Locked = true;
+        OptionValue: Text;
     begin
-        case true of
-            UpperCase(DateToken).Contains('HELP'):
-                begin
-                    Message('CDT[1D] - use CDT to calculate a date formula based on today''s date.\' +
-                            'CWDT[1W] - same as CDT just using the workdate\' +
-                            'APS - allowed posting date Start\' +
-                            'APE = - allowed posting date End');
-                    Handled := true;
-                end;
-            UpperCase(DateToken).Contains('CDT['):
-                begin
-                    FromDate := FindDateFormulaAndCalculate(DateToken, Today());
-                    ToDate := FromDate;
-                    Handled := true;
-                end;
-            UpperCase(DateToken).Contains('CWDT['):
-                begin
-                    FromDate := FindDateFormulaAndCalculate(DateToken, WorkDate());
-                    ToDate := FromDate;
-                    Handled := true;
-                end;
-            UpperCase(DateToken).Contains('APS'):
-                begin
-                    FindAllowedPostingDate(StartDate, EndDate);
-                    FromDate := StartDate;
-                    ToDate := FromDate;
-                    Handled := true;
-                end;
-            UpperCase(DateToken).Contains('APE'):
-                begin
-                    FindAllowedPostingDate(StartDate, EndDate);
-                    FromDate := EndDate;
-                    ToDate := FromDate;
-                    Handled := true;
-                end;
-        end;
+
+        if Field.Get(Tableno, FieldNo) then
+            case Field.Type of
+                Field.Type::Option:
+                    begin
+                        RecRef.Open(Tableno);
+
+                        foreach OptionValue in RecRef.Field(FieldNo).OptionCaption.Split(',') do
+                            TempNameValueBuffer.AddNewEntry(Format(Field.Type), OptionValue);
+                    end;
+                Field.Type::Boolean:
+                    begin
+                        TempNameValueBuffer.AddNewEntry(Format(Field.Type), BooleanYesTxt);
+                        TempNameValueBuffer.AddNewEntry(Format(Field.Type), BooleanNoTxt);
+                    end;
+                Field.Type::Date:
+                    begin
+                        TempNameValueBuffer.AddNewEntry(Format(Field.Type), TodayTxt);
+                        TempNameValueBuffer.AddNewEntry(Format(Field.Type), WorkDateTxt);
+                        TempNameValueBuffer.AddNewEntry(Format(Field.Type), StrSubstNo(DateFormulaTxt, '1D', TodayTxt));
+                    end;
+                Field.Type::DateTime:
+                    TempNameValueBuffer.AddNewEntry(Format(Field.Type), CurrentDateTimeTxt);
+                Field.Type::Time:
+                    TempNameValueBuffer.AddNewEntry(Format(Field.Type), NowTxt);
+                Field.Type::Code:
+                    begin
+                        TempNameValueBuffer.AddNewEntry(Format(Field.Type), UserIdTxt);
+                        if Field.RelationTableNo <> 0 then begin
+                            RecRef.Open(Field.RelationTableNo);
+                            KeyRef := RecRef.KeyIndex(RecRef.CurrentKeyIndex()); //should be PK
+                            if RecRef.FindSet() then
+                                repeat
+                                    //if there is a relation then use the second field. 
+                                    //Example Bin - 1 location Code, 2 Bin Code => we want the 2nd field as bin not the location code so check if it has any relations
+                                    if KeyRef.FieldIndex(1).Relation = 0 then
+                                        TempNameValueBuffer.AddNewEntry(CopyStr(RecRef.Caption, 1, 250), KeyRef.FieldIndex(1).Value)
+                                    else
+                                        TempNameValueBuffer.AddNewEntry(CopyStr(RecRef.Caption, 1, 250), KeyRef.FieldIndex(2).Value);
+                                until RecRef.Next() = 0;
+                        end;
+                    end;
+                Field.Type::Text:
+                    begin
+                        TempNameValueBuffer.AddNewEntry(Format(Field.Type), UserIdTxt);
+                    end;
+                Field.Type::GUID:
+                    TempNameValueBuffer.AddNewEntry(Format(Field.Type), UserSIDTxt);
+            end;
+
+
+
+        if (not TempNameValueBuffer.IsEmpty) and (Page.RunModal(Page::"Name/Value Lookup", TempNameValueBuffer) = Action::LookupOK) then
+            exit(TempNameValueBuffer.Value)
+        else
+            exit(xValue);
     end;
 
-    [EventSubscriber(ObjectType::Codeunit, Codeunit::"Filter Tokens", 'OnResolveTextFilterToken', '', false, false)]
-    local procedure AddEITextFilters(TextToken: Text; var TextFilter: Text; var Handled: Boolean)
+    internal procedure ApplyFilter(var recref: RecordRef; FilterGuid: Guid)
+    var
+        EasyTileTableFilter: Record "Easy Tile Table Filter";
     begin
-        case TextToken of
-            'USERSID':
-                begin
-                    TextFilter := Format(UserSecurityId());
-                    Handled := true;
-                end;
-        end;
+        EasyTileTableFilter.SetRange("Filter Id", FilterGuid);
+        EasyTileTableFilter.SetRange("Table Number", recref.Number);
+        if EasyTileTableFilter.FindSet() then
+            repeat
+                recref.Field(EasyTileTableFilter."Field Number").SetFilter(CalcDynamicValue(EasyTileTableFilter."Field Filter"));
+            until EasyTileTableFilter.Next() = 0;
+    end;
+
+    local procedure CalcDynamicValue(ImportValue: Text) retval: Text
+    var
+        Parameter1: Text;
+        Parameter2: Text;
+        TextToReplace: Text;
+    begin
+        //%DATEFORMULA[%1,%2] 
+        //Static values
+        // TodayTxt: Label '%TODAY';
+        // WorkDateTxt: Label '%WORKDATE';
+        // CurrentDateTimeTxt: Label '%CURRENTDATETIME';
+        // NowTxt: Label '%NOW';
+        // UserIdTxt: Label '%USERID';
+        // CommentTxt: Label '%COMMENT';
+        // UserSIDTxt: Label '%USERSID';
+        retval := ImportValue;
+        if not (
+                ImportValue.Contains(NowTxt) or
+                ImportValue.Contains(TodayTxt) or
+                ImportValue.Contains(DFText) or
+                ImportValue.Contains(WorkDateTxt) or
+                ImportValue.Contains(UserSIDTxt) or
+                ImportValue.Contains(UserIdTxt) or
+                ImportValue.Contains(CurrentDateTimeTxt)) then
+            exit;
+
+        retval := ImportValue.Replace(NowTxt, Format(Time())).Replace(TodayTxt, Format(Today())).Replace(WorkDateTxt, Format(WorkDate())).Replace(UserSIDTxt, Format(UserSecurityId())).Replace(CurrentDateTimeTxt, Format(CurrentDateTime()));
+        retval := EvaluateExpression(retval);
     end;
 
 
 
-    local procedure FindAllowedPostingDate(var StartDate: Date; var EndDate: Date): Boolean
+    procedure EvaluateExpression(Expression: Text) retval: text
     var
-        UserSetup: Record "User Setup";
-        GeneralLedgerSetup: Record "General Ledger Setup";
+        SubExpression: Text;
     begin
-        if UserSetup.Get(UserId()) then
-            if (UserSetup."Allow Posting From" <> 0D) or (UserSetup."Allow Posting To" <> 0D) then begin
-                StartDate := UserSetup."Allow Posting From";
-                EndDate := UserSetup."Allow Posting To";
+        Expression := DelChr(Expression, '<>', ' ');
+        Expression := Expression.ToUpper();
+        Expression := Expression.Replace(DFText, 'D');
+        while HasExpression(Expression, SubExpression) do
+            Expression := Expression.Replace(SubExpression, Format(CalculateExpression(SubExpression)));
+
+        retval := Expression;
+    end;
+
+    procedure HasExpression(Expression: Text; var SubExpression: Text): Boolean
+    var
+        FromChar: Integer;
+        Operation: Text;
+        i: Integer;
+    begin
+        for i := 1 to StrLen(Expression) do begin
+            if Expression[i] = '[' then
+                FromChar := i;
+
+            if Expression[i] = ']' then begin
+                Operation := Expression[FromChar - 1];
+                SubExpression := Operation + CopyStr(Expression, FromChar, i - FromChar + 1);
                 exit(true);
             end;
 
-        GeneralLedgerSetup.GetRecordOnce();
-        if (GeneralLedgerSetup."Allow Posting From" <> 0D) or (GeneralLedgerSetup."Allow Posting To" <> 0D) then begin
-            StartDate := GeneralLedgerSetup."Allow Deferral Posting From";
-            EndDate := GeneralLedgerSetup."Allow Posting To";
-            exit(true);
         end;
-
-        StartDate := 20010101D;
-        EndDate := 99991231D;
-        exit(true);
     end;
 
-    local procedure FindDateFormulaAndCalculate(DateToken: Text; BaseDate: Date): Date
+    procedure CalculateExpression(Expression: Text) retval: Variant
     var
-        StartPos, EndPos : Integer;
-        DateF: DateFormula;
+        InnerExpression: Text;
+        Parameters: List of [Text];
+        Parameter: Text;
+        DF: DateFormula;
+        InDate: Date;
     begin
-        StartPos := StrPos(DateToken, '[') + 1;
-        EndPos := StrPos(DateToken, ']');
-        Evaluate(DateF, CopyStr(DateToken, StartPos, EndPos - StartPos));
-        exit(CalcDate(DateF, BaseDate));
+        InnerExpression := CopyStr(Expression, 3, StrLen(Expression) - 3);
+        case Expression[1] of
+            'D':
+                begin
+                    Parameters := InnerExpression.Split(',');
+                    Parameters.Get(1, Parameter);
+                    Evaluate(DF, Parameter);
+                    Parameters.Get(2, Parameter);
+                    Evaluate(InDate, Parameter);
+
+                    retval := CalcDate(DF, InDate);
+                end;
+        end;
     end;
+
 }

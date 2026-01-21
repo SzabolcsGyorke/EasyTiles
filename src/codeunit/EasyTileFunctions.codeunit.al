@@ -201,6 +201,7 @@ codeunit 80100 "Easy Tile Functions"
     [TryFunction]
     internal procedure CalcTileValue(EasyTileGroupLine: Record "Easy Tile Group Line"; var RefValue: Decimal)
     var
+        EasyTilesFilterMgtSG: Codeunit "Easy Tiles Filter Mgt.SG";
         recref: RecordRef;
         fldref: FieldRef;
     begin
@@ -210,8 +211,11 @@ codeunit 80100 "Easy Tile Functions"
                 if EasyTileGroupLine."Selected Key Index" <> 0 then
                     recref.CurrentKeyIndex(EasyTileGroupLine."Selected Key Index");
 
-                if EasyTileGroupLine.GetTableFilter() <> '' then
-                    recref.SetView(EasyTileGroupLine.GetTableFilter());
+                //if EasyTileGroupLine.GetTableFilter() <> '' then
+                //recref.SetView(EasyTileGroupLine.GetTableFilter());
+                if not IsNullGuid(EasyTileGroupLine."Filter Guid") then
+                    EasyTilesFilterMgtSG.ApplyFilter(recref, EasyTileGroupLine."Filter Guid");
+
                 recref.Ascending(not EasyTileGroupLine."Descending Order");
 
                 if not EasyTileGroupLine."Hide Counter" then
@@ -233,6 +237,7 @@ codeunit 80100 "Easy Tile Functions"
     var
         EasyTileGroupLine: Record "Easy Tile Group Line";
         xMoveEasyTileGroupLine: Record "Easy Tile Group Line";
+        EasyTilesFilterMgtSG: Codeunit "Easy Tiles Filter Mgt.SG";
         recref: RecordRef;
         fldref: FieldRef;
         recrefopen: Boolean;
@@ -275,8 +280,11 @@ codeunit 80100 "Easy Tile Functions"
 
                     recref.Ascending(not EasyTileGroupLine."Descending Order");
 
-                    if EasyTileGroupLine.GetTableFilter() <> '' then
-                        recref.SetView(EasyTileGroupLine.GetTableFilter());
+                    // if EasyTileGroupLine.GetTableFilter() <> '' then
+                    //     recref.SetView(EasyTileGroupLine.GetTableFilter());
+                    if not IsNullGuid(EasyTileGroupLine."Filter Guid") then
+                        EasyTilesFilterMgtSG.ApplyFilter(recref, EasyTileGroupLine."Filter Guid");
+
                     recrefopen := (recref.FindFirst()) or (recref.Count = 0);
                     varrecref := recref;
                 end;

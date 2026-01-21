@@ -79,6 +79,7 @@ page 80103 "Easy Tile Groups"
                 ToolTip = 'Edit the default tile assignment of the group';
                 Image = AbsenceCategory;
                 AboutTitle = 'Edit mode';
+                Enabled = AdminAccess;
                 AboutText = 'To create, modify, move or delete tiles within the selected group use the Edit interface.';
                 trigger OnAction()
                 var
@@ -89,4 +90,18 @@ page 80103 "Easy Tile Groups"
             }
         }
     }
+
+    trigger OnOpenPage()
+    var
+        UserSetup: Record "User Setup";
+    begin
+        AdminAccess := false;
+        if UserSetup.Get(UserId) then
+            AdminAccess := UserSetup."EasyTile Admin SG";
+
+        CurrPage.Editable(AdminAccess);
+    end;
+
+    var
+        AdminAccess: Boolean;
 }

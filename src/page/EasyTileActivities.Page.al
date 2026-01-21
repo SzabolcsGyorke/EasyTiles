@@ -563,6 +563,7 @@ page 80101 "Easy Tile Activities"
             {
                 Caption = 'Edit Tile Group';
                 Image = Edit;
+                Visible = AdminAccess;
                 Enabled = not EditMode;
                 trigger OnAction()
                 var
@@ -601,6 +602,7 @@ page 80101 "Easy Tile Activities"
                 Caption = 'Toggle Move Mode';
                 ToolTip = 'Activates / deactivates move mode. Click on a tile and move left and right. When finished toggle the move mode and return to edit.';
                 Visible = EditMode;
+                Enabled = AdminAccess;
                 Image = Dimensions;
                 trigger OnAction()
                 begin
@@ -695,6 +697,7 @@ page 80101 "Easy Tile Activities"
         lbl_tb: Label 'TileBrickProducts';
         EasyTileFunctions: Codeunit "Easy Tile Functions";
         [InDataSet]
+        AdminAccess: Boolean;
         TimerEnabled: Boolean;
         Visible0: Boolean;
         [InDataSet]
@@ -795,6 +798,8 @@ page 80101 "Easy Tile Activities"
 
 
     trigger OnOpenPage()
+    var
+        UserSetup: Record "User Setup";
     begin
         if rec."Preview Mode" and (EasyTileOpenGroup.GetPreviewMode() or EasyTileOpenGroup.GetEditMode()) then begin
             PreviewMode := EasyTileOpenGroup.GetPreviewMode();
@@ -821,6 +826,10 @@ page 80101 "Easy Tile Activities"
 
         EasyTileFunctions.GenerateTileBuffer(UserId(), Rec, GroupCaption, layout);
         Visible0 := (layout = layout::"2x10");
+
+        AdminAccess := false;
+        if UserSetup.Get(UserId) then
+            AdminAccess := UserSetup."EasyTile Admin SG";
     end;
 
     local procedure MoveTile(Direction: Integer)

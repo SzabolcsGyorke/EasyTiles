@@ -68,4 +68,18 @@ page 80102 "Easy Tile Group Assignments"
         Rec."User Security Id" := UserSecurityId();
         Rec."Profile ID" := UserSettings.ProfileId();
     end;
+
+    trigger OnOpenPage()
+    var
+        UserSetup: Record "User Setup";
+    begin
+        AdminAccess := false;
+        if UserSetup.Get(UserId) then
+            AdminAccess := UserSetup."EasyTile Admin SG";
+
+        CurrPage.Editable(AdminAccess);
+    end;
+
+    var
+        AdminAccess: Boolean;
 }
