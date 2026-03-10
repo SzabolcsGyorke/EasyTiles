@@ -97,6 +97,21 @@ table 80101 "Easy Tile Group"
         EasyTileGroupAssignment.Reset();
         EasyTileGroupAssignment.SetRange("Group 4", Code);
         NoOfAssignments += EasyTileGroupAssignment.Count();
+        EasyTileGroupAssignment.Reset();
+        EasyTileGroupAssignment.SetRange("Group 5", Code);
+        NoOfAssignments += EasyTileGroupAssignment.Count();
+        EasyTileGroupAssignment.Reset();
+        EasyTileGroupAssignment.SetRange("Group 6", Code);
+        NoOfAssignments += EasyTileGroupAssignment.Count();
+        EasyTileGroupAssignment.Reset();
+        EasyTileGroupAssignment.SetRange("Group 7", Code);
+        NoOfAssignments += EasyTileGroupAssignment.Count();
+        EasyTileGroupAssignment.Reset();
+        EasyTileGroupAssignment.SetRange("Group 8", Code);
+        NoOfAssignments += EasyTileGroupAssignment.Count();
+        EasyTileGroupAssignment.Reset();
+        EasyTileGroupAssignment.SetRange("Group 9", Code);
+        NoOfAssignments += EasyTileGroupAssignment.Count();
 
         if NoOfAssignments > 0 then
             Error(AssignmentsExistsErr, Code);

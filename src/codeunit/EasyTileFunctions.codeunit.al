@@ -83,6 +83,36 @@ codeunit 80100 "Easy Tile Functions"
                         if EasyTileGroupAssignment."Group 4" = '' then exit;
                         EasyTileGroup.Get(EasyTileGroupAssignment."Group 4");
                     end;
+                5:
+                    begin
+                        EasyTileGroupLine.SetRange("Tile Group Code", EasyTileGroupAssignment."Group 5");
+                        if EasyTileGroupAssignment."Group 5" = '' then exit;
+                        EasyTileGroup.Get(EasyTileGroupAssignment."Group 5");
+                    end;
+                6:
+                    begin
+                        EasyTileGroupLine.SetRange("Tile Group Code", EasyTileGroupAssignment."Group 6");
+                        if EasyTileGroupAssignment."Group 6" = '' then exit;
+                        EasyTileGroup.Get(EasyTileGroupAssignment."Group 6");
+                    end;
+                7:
+                    begin
+                        EasyTileGroupLine.SetRange("Tile Group Code", EasyTileGroupAssignment."Group 7");
+                        if EasyTileGroupAssignment."Group 7" = '' then exit;
+                        EasyTileGroup.Get(EasyTileGroupAssignment."Group 7");
+                    end;
+                8:
+                    begin
+                        EasyTileGroupLine.SetRange("Tile Group Code", EasyTileGroupAssignment."Group 8");
+                        if EasyTileGroupAssignment."Group 8" = '' then exit;
+                        EasyTileGroup.Get(EasyTileGroupAssignment."Group 8");
+                    end;
+                9:
+                    begin
+                        EasyTileGroupLine.SetRange("Tile Group Code", EasyTileGroupAssignment."Group 9");
+                        if EasyTileGroupAssignment."Group 9" = '' then exit;
+                        EasyTileGroup.Get(EasyTileGroupAssignment."Group 9");
+                    end;
             end;
         end else begin
             EasyTileGroup.Get(PreviewTileGroupCode);
@@ -202,6 +232,7 @@ codeunit 80100 "Easy Tile Functions"
     internal procedure CalcTileValue(EasyTileGroupLine: Record "Easy Tile Group Line"; var RefValue: Decimal)
     var
         EasyTilesFilterMgtSG: Codeunit "Easy Tiles Filter Mgt.SG";
+        TempDecimal: Decimal;
         recref: RecordRef;
         fldref: FieldRef;
     begin
@@ -227,6 +258,13 @@ codeunit 80100 "Easy Tile Functions"
                                 fldref := recref.Field(EasyTileGroupLine."Field No.");
                                 if fldref.CalcSum() then
                                     RefValue := fldref.Value;
+                            end;
+                        EasyTileGroupLine.Operation::Average:
+                            if EasyTileGroupLine."Field No." <> 0 then begin
+                                fldref := recref.Field(EasyTileGroupLine."Field No.");
+                                if fldref.CalcSum() and (recref.Count <> 0) then
+                                    if Evaluate(TempDecimal, fldref.Value) then
+                                        RefValue := Round((TempDecimal / recref.Count), 0.01);
                             end;
                     end;
             end;

@@ -4,7 +4,7 @@ pageextension 80102 "User Settings SG" extends "User Settings"
     {
         addafter(MyNotificationsLbl)
         {
-            field(TileGroups; CahmgeTileGroupAssTxt)
+            field(TileGroups; ChangeTileGroupAssTxt)
             {
                 Caption = 'Tiles';
                 ApplicationArea = All;
@@ -32,5 +32,5 @@ pageextension 80102 "User Settings SG" extends "User Settings"
     }
 
     var
-        CahmgeTileGroupAssTxt: Label 'Change Easy Tile Group Assignmnets';
+        ChangeTileGroupAssTxt: Label 'Change Easy Tile Group Assignments';
 }

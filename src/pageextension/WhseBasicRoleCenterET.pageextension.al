@@ -37,6 +37,36 @@ pageextension 80105 "Whse. Basic Role Center ET" extends "Whse. Basic Role Cente
                 SubPageView = where("Tile Group Position" = const(4), "Edit Mode" = const(false));
                 ApplicationArea = all;
             }
+            part(TileGroup5; "Easy Tile Activities")
+            {
+                Caption = 'TileGroup5';
+                SubPageView = where("Tile Group Position" = const(5), "Edit Mode" = const(false));
+                ApplicationArea = all;
+            }
+            part(TileGroup6; "Easy Tile Activities")
+            {
+                Caption = 'TileGroup6';
+                SubPageView = where("Tile Group Position" = const(6), "Edit Mode" = const(false));
+                ApplicationArea = all;
+            }
+            part(TileGroup7; "Easy Tile Activities")
+            {
+                Caption = 'TileGroup7';
+                SubPageView = where("Tile Group Position" = const(7), "Edit Mode" = const(false));
+                ApplicationArea = all;
+            }
+            part(TileGroup8; "Easy Tile Activities")
+            {
+                Caption = 'TileGroup8';
+                SubPageView = where("Tile Group Position" = const(8), "Edit Mode" = const(false));
+                ApplicationArea = all;
+            }
+            part(TileGroup9; "Easy Tile Activities")
+            {
+                Caption = 'TileGroup9';
+                SubPageView = where("Tile Group Position" = const(9), "Edit Mode" = const(false));
+                ApplicationArea = all;
+            }
         }
     }
 }

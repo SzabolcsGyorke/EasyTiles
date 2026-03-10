@@ -117,6 +117,7 @@ page 80105 "Easy Tile Setup Card"
                     {
                         ToolTip = 'Specifies the value of the Field Name field.', Comment = '%';
                         Editable = false;
+                        ShowMandatory = Rec.Operation <> Rec.Operation::Count;
                         trigger OnAssistEdit()
                         begin
                             Rec.Validate("Field No.", Rec.SelectField());

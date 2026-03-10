@@ -57,6 +57,27 @@ page 80102 "Easy Tile Group Assignments"
                 {
                     ToolTip = 'Specifies the value of the Group 4 field.';
                 }
+                field("Group 5"; Rec."Group 5")
+                {
+                    ToolTip = 'Specifies the value of the Group 5 field.', Comment = '%';
+                }
+                field("Group 6"; Rec."Group 6")
+                {
+                    ToolTip = 'Specifies the value of the Group 6 field.', Comment = '%';
+                }
+                field("Group 7"; Rec."Group 7")
+                {
+                    ToolTip = 'Specifies the value of the Group 7 field.', Comment = '%';
+                }
+                field("Group 8"; Rec."Group 8")
+                {
+                    ToolTip = 'Specifies the value of the Group 8 field.', Comment = '%';
+                }
+                field("Group 9"; Rec."Group 9")
+                {
+                    ToolTip = 'Specifies the value of the Group 9 field.', Comment = '%';
+                }
+
             }
         }
     }

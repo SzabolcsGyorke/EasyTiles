@@ -56,6 +56,36 @@ table 80103 "Easy Tile Group Assignment"
             DataClassification = CustomerContent;
             TableRelation = "Easy Tile Group";
         }
+        field(15; "Group 5"; Code[20])
+        {
+            Caption = 'Group 5';
+            DataClassification = CustomerContent;
+            TableRelation = "Easy Tile Group";
+        }
+        field(16; "Group 6"; Code[20])
+        {
+            Caption = 'Group 6';
+            DataClassification = CustomerContent;
+            TableRelation = "Easy Tile Group";
+        }
+        field(17; "Group 7"; Code[20])
+        {
+            Caption = 'Group 7';
+            DataClassification = CustomerContent;
+            TableRelation = "Easy Tile Group";
+        }
+        field(18; "Group 8"; Code[20])
+        {
+            Caption = 'Group 8';
+            DataClassification = CustomerContent;
+            TableRelation = "Easy Tile Group";
+        }
+        field(19; "Group 9"; Code[20])
+        {
+            Caption = 'Group 9';
+            DataClassification = CustomerContent;
+            TableRelation = "Easy Tile Group";
+        }
     }
     keys
     {

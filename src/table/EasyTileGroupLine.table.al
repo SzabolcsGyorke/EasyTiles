@@ -164,8 +164,8 @@ table 80102 "Easy Tile Group Line"
         field(24; "Operation"; Option)
         {
             Caption = 'Operation';
-            OptionMembers = ,Count,Sum;
-            OptionCaption = ' ,Count,Sum';
+            OptionMembers = ,Count,Sum,Average;
+            OptionCaption = ' ,Count,Sum,Average';
             DataClassification = CustomerContent;
         }
         field(25; "Field No."; Integer)
