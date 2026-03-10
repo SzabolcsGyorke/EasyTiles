@@ -280,6 +280,10 @@ table 80102 "Easy Tile Group Line"
             Caption = 'Descending Order';
             DataClassification = CustomerContent;
         }
+        field(54; "Size"; Enum "Easy Tile Size S8L")
+        {
+            Caption = 'Size';
+        }
 
 
 

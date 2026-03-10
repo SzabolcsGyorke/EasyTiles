@@ -380,7 +380,7 @@ codeunit 80100 "Easy Tile Functions"
 
     end;
 
-    internal procedure GetTileStyle(EasyTileBuffer: Record "Easy Tile Buffer" temporary; TilePosition: Integer; var tilebackgroundcolour: text; var tilefontcolour: text; var hidecounter: Boolean; var iconsvg: text): Boolean
+    internal procedure GetTileStyle(EasyTileBuffer: Record "Easy Tile Buffer" temporary; TilePosition: Integer; var tilebackgroundcolour: text; var tilefontcolour: text; var hidecounter: Boolean; var iconsvg: text; var Size: Enum "Easy Tile Size S8L"): Boolean
     var
         EasyTileGroupLine: Record "Easy Tile Group Line";
         EasyTileSVGHeader: Record "Easy Tile SVG Header";
@@ -399,10 +399,11 @@ codeunit 80100 "Easy Tile Functions"
             tilebackgroundcolour := EasyTileGroupLine."Tile Background Colour";
             tilefontcolour := EasyTileGroupLine."Tile Font Colour";
             hidecounter := EasyTileGroupLine."Hide Counter";
+            Size := EasyTileGroupLine.Size;
             if EasyTileSVGHeader.Get(EasyTileGroupLine."Icon SVG Code") then
                 iconsvg := EasyTileSVGManagement.CreateSVG(EasyTileSVGHeader, '40', '40'); //icon size limit to 40x40
 
-            exit(hidecounter or (tilebackgroundcolour <> '') or (tilefontcolour <> '') or (iconsvg <> ''));
+            exit(hidecounter or (tilebackgroundcolour <> '') or (tilefontcolour <> '') or (iconsvg <> '') or (Size <> Size::Normal));
         end;
     end;
 

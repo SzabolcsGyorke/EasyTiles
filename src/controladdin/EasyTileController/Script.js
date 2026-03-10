@@ -24,7 +24,7 @@
 
 function FindAndSetTileGroup(elementid, caption, setfindcontrol) {
     nodes = window.parent.document.querySelectorAll(elementid); //find all controls by page name
-   
+    console.log('Tile found '+ elementid);
     //find the control addin and set size - class="control-addin-container"
     parentnodes = nodes[nodes.length - 1].offsetParent;
     parentnodes = parentnodes.querySelectorAll('[class="control-addin-container"]');
@@ -81,10 +81,11 @@ function SetGroupCaption2(elementid,Caption1, Caption2, Caption3, Caption4){
 }
 
 
-function EditTile(elementid,groupid,tileid,removenumber,peektext,peektextstyle,tilebackground, tilefontcolor, iconsvg){
-    
+function EditTile(elementid,groupid,tileid,removenumber,peektext,peektextstyle,tilebackground,tilefontcolor,iconsvg,size){
+    console.warn('Tile edit: '+elementid);
     nodes = window.parent.document.querySelectorAll(elementid); //find all controls by page name   
     parentnodes = nodes[nodes.length - 1].offsetParent;
+    
     
     tilegroups = parentnodes.querySelectorAll('[class="flex"], [class="flex part-field-hidden-before-form-open"]');
     if (tilegroups.length > 0){
@@ -94,15 +95,36 @@ function EditTile(elementid,groupid,tileid,removenumber,peektext,peektextstyle,t
             tile = tiles[tileid - 1];
             //change tile colour
             tilestyle = tile.querySelector('div div div a'); //path to the tile <a>
+            if (size == 'Normal'){
+                 tilestyle.setAttribute('style','min-width:122px; min-height:138px;');
+                 sentiment = Array.from(tilestyle.childNodes).find(node => node.nodeType === Node.ELEMENT_NODE && node.className.startsWith('sentiment-container'));
+                 sentiment.setAttribute('style','width: 102px;');
+                 
+                 //224px
+            }
+            if (size == 'Wide'){
+                 tilestyle.setAttribute('style','min-width:244px; min-height:138px;');
+                 //sentiments =  tilestyle.childNodes.querySelector("div[class^='sentiment-container']");
+                 sentiment = Array.from(tilestyle.childNodes).find(node => node.nodeType === Node.ELEMENT_NODE && node.className.startsWith('sentiment-container'));
+                 sentiment.setAttribute('style','width: 224px;');
+            }
+            if (size == 'Large'){
+                 tilestyle.setAttribute('style','min-width:244px; min-height:276px;');
+                 sentiment = Array.from(tilestyle.childNodes).find(node => node.nodeType === Node.ELEMENT_NODE && node.className.startsWith('sentiment-container'));
+                 sentiment.setAttribute('style','width: 224px;');
+
+                 //caption container 160px;
+            }
+
             if (tilebackground != '' && tilefontcolor != ''){
-                tilestyle.setAttribute('style', 'color:'+tilefontcolor+' !important; '+'background:'+tilebackground+' !important');
+                tilestyle.setAttribute('style', tilestyle.getAttribute('style')+' color:'+tilefontcolor+' !important; '+'background:'+tilebackground+' !important');
                 
             }
             if (tilebackground != ''&& tilefontcolor == ''){
-                tilestyle.setAttribute('style', 'background:'+tilebackground+' !important');
+                tilestyle.setAttribute('style',  tilestyle.getAttribute('style')+'background:'+tilebackground+' !important');
             }
             if (tilebackground == '' && tilefontcolor != ''){
-                tilestyle.setAttribute('style',  'color:'+tilefontcolor+' !important');
+                tilestyle.setAttribute('style',   tilestyle.getAttribute('style')+'color:'+tilefontcolor+' !important');
             }
 
             //remove the counter

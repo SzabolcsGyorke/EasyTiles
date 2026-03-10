@@ -20,6 +20,10 @@ page 80105 "Easy Tile Setup Card"
                 {
                     ToolTip = 'Specifies the value of the Caption field.';
                 }
+                field(Size; Rec.Size)
+                {
+                    ToolTip = 'Specifies the value of the Size field.', Comment = '%';
+                }
                 field(Visible; Rec.Visible)
                 {
                     ToolTip = 'Specifies the value of the Visible field.';
