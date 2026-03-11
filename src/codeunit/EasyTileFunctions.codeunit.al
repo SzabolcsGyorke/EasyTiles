@@ -262,9 +262,10 @@ codeunit 80100 "Easy Tile Functions"
                         EasyTileGroupLine.Operation::Average:
                             if EasyTileGroupLine."Field No." <> 0 then begin
                                 fldref := recref.Field(EasyTileGroupLine."Field No.");
-                                if fldref.CalcSum() and (recref.Count <> 0) then
-                                    if Evaluate(TempDecimal, fldref.Value) then
-                                        RefValue := Round((TempDecimal / recref.Count), 0.01);
+                                if fldref.CalcSum() and (recref.Count <> 0) then begin
+                                    TempDecimal := fldref.Value;
+                                    RefValue := Round((TempDecimal / recref.Count), 0.01);
+                                end;
                             end;
                     end;
             end;
@@ -380,16 +381,16 @@ codeunit 80100 "Easy Tile Functions"
 
     end;
 
-    internal procedure GetTileStyle(EasyTileBuffer: Record "Easy Tile Buffer" temporary; TilePosition: Integer; var tilebackgroundcolour: text; var tilefontcolour: text; var hidecounter: Boolean; var iconsvg: text; var Size: Enum "Easy Tile Size S8L"): Boolean
+    internal procedure GetTileStyle(EasyTileBuffer: Record "Easy Tile Buffer" temporary; TilePosition: Integer; var tilebackgroundcolour: text; var tilefontcolour: text; var hidecounter: Boolean; var iconsvg: text; var Size: Enum "Easy Tile Size S8L"; var outcaption: text): Boolean
     var
         EasyTileGroupLine: Record "Easy Tile Group Line";
         EasyTileSVGHeader: Record "Easy Tile SVG Header";
         EasyTileSVGManagement: Codeunit "Easy Tile SVG Management";
-        Caption: Text;
         Visible: Boolean;
         Style: text;
         Value: Decimal;
     begin
+        outcaption := '';
         tilefontcolour := '';
         tilebackgroundcolour := '';
         hidecounter := false;
@@ -400,10 +401,11 @@ codeunit 80100 "Easy Tile Functions"
             tilefontcolour := EasyTileGroupLine."Tile Font Colour";
             hidecounter := EasyTileGroupLine."Hide Counter";
             Size := EasyTileGroupLine.Size;
+            outcaption := EasyTileGroupLine.Caption;
             if EasyTileSVGHeader.Get(EasyTileGroupLine."Icon SVG Code") then
                 iconsvg := EasyTileSVGManagement.CreateSVG(EasyTileSVGHeader, '40', '40'); //icon size limit to 40x40
 
-            exit(hidecounter or (tilebackgroundcolour <> '') or (tilefontcolour <> '') or (iconsvg <> '') or (Size <> Size::Normal));
+            exit((hidecounter or (tilebackgroundcolour <> '') or (tilefontcolour <> '') or (iconsvg <> '') or (Size = Size::Normal) or (Size <> Size::Normal)) and (EasyTileGroupLine.Visible)); //this will trigger always
         end;
     end;
 

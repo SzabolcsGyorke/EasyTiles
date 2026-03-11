@@ -36,6 +36,7 @@ page 80108 "Easy Tile colour Picker"
                     CurrPage.ColourPicker.addPreset('', '#39B294', 'rgb(57, 178, 148)');
                     CurrPage.ColourPicker.addPreset('', '#73BA5A', 'rgb(115, 186, 90)');
                     CurrPage.ColourPicker.addPreset('', '#E65E6D', 'rgb(230, 94, 109)');
+                    CurrPage.ColourPicker.addPreset('', '#008489', 'rgb(0, 132, 137)');
 
                     CurrPage.ColourPicker.ShowColourPicker(InColour);
                 end;

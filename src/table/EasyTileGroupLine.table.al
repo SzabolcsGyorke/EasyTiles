@@ -25,7 +25,7 @@ table 80102 "Easy Tile Group Line"
             DataClassification = CustomerContent;
             TableRelation = User."User Security ID";
         }
-        field(5; Caption; Text[50])
+        field(5; Caption; Text[250])
         {
             Caption = 'Caption';
             DataClassification = CustomerContent;

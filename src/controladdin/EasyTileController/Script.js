@@ -81,7 +81,7 @@ function SetGroupCaption2(elementid,Caption1, Caption2, Caption3, Caption4){
 }
 
 
-function EditTile(elementid,groupid,tileid,removenumber,peektext,peektextstyle,tilebackground,tilefontcolor,iconsvg,size){
+function EditTile(elementid,groupid,tileid,removenumber,peektext,peektextstyle,tilebackground,tilefontcolor,iconsvg,size,caption){
     console.warn('Tile edit: '+elementid);
     nodes = window.parent.document.querySelectorAll(elementid); //find all controls by page name   
     parentnodes = nodes[nodes.length - 1].offsetParent;
@@ -99,21 +99,35 @@ function EditTile(elementid,groupid,tileid,removenumber,peektext,peektextstyle,t
                  tilestyle.setAttribute('style','min-width:122px; min-height:138px;');
                  sentiment = Array.from(tilestyle.childNodes).find(node => node.nodeType === Node.ELEMENT_NODE && node.className.startsWith('sentiment-container'));
                  sentiment.setAttribute('style','width: 102px;');
-                 
-                 //224px
+                 //caption container 
+                 captioncontainer = Array.from(tilestyle.childNodes).find(node => node.nodeType === Node.ELEMENT_NODE && node.className.startsWith('caption-container'));
+                 captioncontainer.setAttribute('style','');
             }
             if (size == 'Wide'){
                  tilestyle.setAttribute('style','min-width:244px; min-height:138px;');
                  //sentiments =  tilestyle.childNodes.querySelector("div[class^='sentiment-container']");
                  sentiment = Array.from(tilestyle.childNodes).find(node => node.nodeType === Node.ELEMENT_NODE && node.className.startsWith('sentiment-container'));
                  sentiment.setAttribute('style','width: 224px;');
+                 //caption container 
+                captioncontainer = Array.from(tilestyle.childNodes).find(node => node.nodeType === Node.ELEMENT_NODE && node.className.startsWith('caption-container'));
+                captioncontainer.setAttribute('style','');
             }
             if (size == 'Large'){
                  tilestyle.setAttribute('style','min-width:244px; min-height:276px;');
                  sentiment = Array.from(tilestyle.childNodes).find(node => node.nodeType === Node.ELEMENT_NODE && node.className.startsWith('sentiment-container'));
                  sentiment.setAttribute('style','width: 224px;');
 
-                 //caption container 160px;
+                //caption container 160px;
+                captioncontainer = Array.from(tilestyle.childNodes).find(node => node.nodeType === Node.ELEMENT_NODE && node.className.startsWith('caption-container'));
+                captioncontainer.setAttribute('style','height: 160px; max-width: 224px;');
+                secondline = captioncontainer.childNodes[0].childNodes[0].childNodes[1].lastChild;//childNodes[0].childNodes[0].childNodes[0].childNodes[0]; 
+                secondline.innerText = caption;
+                secondline.setAttribute('style','white-space:pre-wrap;');
+
+                firstline = captioncontainer.childNodes[0].childNodes[0].childNodes[0];
+                firstline.innerText = '';
+                firstline.className = '';
+                firstline.remove;
             }
 
             if (tilebackground != '' && tilefontcolor != ''){

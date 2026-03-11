@@ -200,6 +200,7 @@ page 80105 "Easy Tile Setup Card"
                     begin
                         CurrPage.SaveRecord();
                         EasyTilecolourPicker.InitColour(Rec."Tile Background Colour");
+                        Commit();
                         EasyTilecolourPicker.RunModal();
                         if EasyTilecolourPicker.IsColourChanged() then begin
                             Rec."Tile Font Colour" := EasyTilecolourPicker.GetColour();

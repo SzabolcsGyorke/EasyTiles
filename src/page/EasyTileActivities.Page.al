@@ -913,6 +913,7 @@ page 80101 "Easy Tile Activities"
         controlid2: Text;
         iconsvg: Text;
         size: enum "Easy Tile Size S8L";
+        caption: text;
     begin
         Visible1 := Rec."Visible 1";
         Visible2 := Rec."Visible 2";
@@ -975,8 +976,8 @@ page 80101 "Easy Tile Activities"
 
                     tilegroup := 2;
                 end;
-                if EasyTileFunctions.GetTileStyle(Rec, i, tilebackgroundcolour, tilefontcolour, hidecounter, iconsvg, size) then
-                    CurrPage.TileController.EditTile(controlid2, tilegroup, tiledisplayid, hidecounter, '', '', tilebackgroundcolour, tilefontcolour, iconsvg, Format(size));
+                if EasyTileFunctions.GetTileStyle(Rec, i, tilebackgroundcolour, tilefontcolour, hidecounter, iconsvg, size, caption) then
+                    CurrPage.TileController.EditTile(controlid2, tilegroup, tiledisplayid, hidecounter, '', '', tilebackgroundcolour, tilefontcolour, iconsvg, Format(size), caption);
             end;
 
             if layout = layout::"4x5" then begin
@@ -1006,8 +1007,8 @@ page 80101 "Easy Tile Activities"
                         tiledisplayid += 1;
                     tilegroup := 4;
                 end;
-                if EasyTileFunctions.GetTileStyle(Rec, i, tilebackgroundcolour, tilefontcolour, hidecounter, iconsvg, size) then
-                    CurrPage.TileController.EditTile(controlid2, tilegroup, tiledisplayid, hidecounter, '', '', tilebackgroundcolour, tilefontcolour, iconsvg, Format(size));
+                if EasyTileFunctions.GetTileStyle(Rec, i, tilebackgroundcolour, tilefontcolour, hidecounter, iconsvg, size, caption) then
+                    CurrPage.TileController.EditTile(controlid2, tilegroup, tiledisplayid, hidecounter, '', '', tilebackgroundcolour, tilefontcolour, iconsvg, Format(size), caption);
             end;
 
 

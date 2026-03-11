@@ -77,26 +77,26 @@ table 80100 "Easy Tile Buffer"
         field(29; "Position 20"; Integer) { Caption = 'Postiion 20'; DataClassification = CustomerContent; }
 
 
-        field(30; "Caption 1"; Text[50]) { Caption = 'Caption 1'; DataClassification = CustomerContent; }
-        field(31; "Caption 2"; Text[50]) { Caption = 'Caption 2'; DataClassification = CustomerContent; }
-        field(32; "Caption 3"; Text[50]) { Caption = 'Caption 3'; DataClassification = CustomerContent; }
-        field(33; "Caption 4"; Text[50]) { Caption = 'Caption 4'; DataClassification = CustomerContent; }
-        field(34; "Caption 5"; Text[50]) { Caption = 'Caption 5'; DataClassification = CustomerContent; }
-        field(35; "Caption 6"; Text[50]) { Caption = 'Caption 6'; DataClassification = CustomerContent; }
-        field(36; "Caption 7"; Text[50]) { Caption = 'Caption 7'; DataClassification = CustomerContent; }
-        field(37; "Caption 8"; Text[50]) { Caption = 'Caption 8'; DataClassification = CustomerContent; }
-        field(38; "Caption 9"; Text[50]) { Caption = 'Caption 9'; DataClassification = CustomerContent; }
-        field(39; "Caption 10"; Text[50]) { Caption = 'Caption 10'; DataClassification = CustomerContent; }
-        field(40; "Caption 11"; Text[50]) { Caption = 'Caption 11'; DataClassification = CustomerContent; }
-        field(41; "Caption 12"; Text[50]) { Caption = 'Caption 12'; DataClassification = CustomerContent; }
-        field(42; "Caption 13"; Text[50]) { Caption = 'Caption 13'; DataClassification = CustomerContent; }
-        field(43; "Caption 14"; Text[50]) { Caption = 'Caption 14'; DataClassification = CustomerContent; }
-        field(44; "Caption 15"; Text[50]) { Caption = 'Caption 15'; DataClassification = CustomerContent; }
-        field(45; "Caption 16"; Text[50]) { Caption = 'Caption 16'; DataClassification = CustomerContent; }
-        field(46; "Caption 17"; Text[50]) { Caption = 'Caption 17'; DataClassification = CustomerContent; }
-        field(47; "Caption 18"; Text[50]) { Caption = 'Caption 18'; DataClassification = CustomerContent; }
-        field(48; "Caption 19"; Text[50]) { Caption = 'Caption 19'; DataClassification = CustomerContent; }
-        field(49; "Caption 20"; Text[50]) { Caption = 'Caption 20'; DataClassification = CustomerContent; }
+        field(30; "Caption 1"; Text[250]) { Caption = 'Caption 1'; DataClassification = CustomerContent; }
+        field(31; "Caption 2"; Text[250]) { Caption = 'Caption 2'; DataClassification = CustomerContent; }
+        field(32; "Caption 3"; Text[250]) { Caption = 'Caption 3'; DataClassification = CustomerContent; }
+        field(33; "Caption 4"; Text[250]) { Caption = 'Caption 4'; DataClassification = CustomerContent; }
+        field(34; "Caption 5"; Text[250]) { Caption = 'Caption 5'; DataClassification = CustomerContent; }
+        field(35; "Caption 6"; Text[250]) { Caption = 'Caption 6'; DataClassification = CustomerContent; }
+        field(36; "Caption 7"; Text[250]) { Caption = 'Caption 7'; DataClassification = CustomerContent; }
+        field(37; "Caption 8"; Text[250]) { Caption = 'Caption 8'; DataClassification = CustomerContent; }
+        field(38; "Caption 9"; Text[250]) { Caption = 'Caption 9'; DataClassification = CustomerContent; }
+        field(39; "Caption 10"; Text[250]) { Caption = 'Caption 10'; DataClassification = CustomerContent; }
+        field(40; "Caption 11"; Text[250]) { Caption = 'Caption 11'; DataClassification = CustomerContent; }
+        field(41; "Caption 12"; Text[250]) { Caption = 'Caption 12'; DataClassification = CustomerContent; }
+        field(42; "Caption 13"; Text[250]) { Caption = 'Caption 13'; DataClassification = CustomerContent; }
+        field(43; "Caption 14"; Text[250]) { Caption = 'Caption 14'; DataClassification = CustomerContent; }
+        field(44; "Caption 15"; Text[250]) { Caption = 'Caption 15'; DataClassification = CustomerContent; }
+        field(45; "Caption 16"; Text[250]) { Caption = 'Caption 16'; DataClassification = CustomerContent; }
+        field(46; "Caption 17"; Text[250]) { Caption = 'Caption 17'; DataClassification = CustomerContent; }
+        field(47; "Caption 18"; Text[250]) { Caption = 'Caption 18'; DataClassification = CustomerContent; }
+        field(48; "Caption 19"; Text[250]) { Caption = 'Caption 19'; DataClassification = CustomerContent; }
+        field(49; "Caption 20"; Text[250]) { Caption = 'Caption 20'; DataClassification = CustomerContent; }
 
         field(50; "Visible 1"; Boolean) { Caption = 'Visible 1'; DataClassification = CustomerContent; }
         field(51; "Visible 2"; Boolean) { Caption = 'Visible 2'; DataClassification = CustomerContent; }
