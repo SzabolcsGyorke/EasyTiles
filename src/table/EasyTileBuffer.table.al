@@ -1,7 +1,8 @@
 table 80100 "Easy Tile Buffer"
 {
     Caption = 'Easy Tile Buffer';
-    DataClassification = ToBeClassified;
+    DataClassification = CustomerContent;
+    TableType = Temporary;
 
     fields
     {
@@ -161,8 +162,31 @@ table 80100 "Easy Tile Buffer"
         field(108; "Value 19"; Decimal) { Caption = 'Value 19'; DataClassification = CustomerContent; }
         field(109; "Value 20"; Decimal) { Caption = 'Value 20'; DataClassification = CustomerContent; }
 
+        field(110; "Peek 1"; Text[50]) { Caption = 'Peek 1'; DataClassification = CustomerContent; }
+        field(111; "Peek 2"; Text[50]) { Caption = 'Peek 2'; DataClassification = CustomerContent; }
+        field(112; "Peek 3"; Text[50]) { Caption = 'Peek 3'; DataClassification = CustomerContent; }
+        field(113; "Peek 4"; Text[50]) { Caption = 'Peek 4'; DataClassification = CustomerContent; }
+        field(114; "Peek 5"; Text[50]) { Caption = 'Peek 5'; DataClassification = CustomerContent; }
+        field(115; "Peek 6"; Text[50]) { Caption = 'Peek 6'; DataClassification = CustomerContent; }
+        field(116; "Peek 7"; Text[50]) { Caption = 'Peek 7'; DataClassification = CustomerContent; }
+        field(117; "Peek 8"; Text[50]) { Caption = 'Peek 8'; DataClassification = CustomerContent; }
+        field(118; "Peek 9"; Text[50]) { Caption = 'Peek 9'; DataClassification = CustomerContent; }
+        field(119; "Peek 10"; Text[50]) { Caption = 'Peek 10'; DataClassification = CustomerContent; }
+        field(120; "Peek 11"; Text[50]) { Caption = 'Peek 11'; DataClassification = CustomerContent; }
+        field(121; "Peek 12"; Text[50]) { Caption = 'Peek 12'; DataClassification = CustomerContent; }
+        field(122; "Peek 13"; Text[50]) { Caption = 'Peek 13'; DataClassification = CustomerContent; }
+        field(123; "Peek 14"; Text[50]) { Caption = 'Peek 14'; DataClassification = CustomerContent; }
+        field(124; "Peek 15"; Text[50]) { Caption = 'Peek 15'; DataClassification = CustomerContent; }
+        field(125; "Peek 16"; Text[50]) { Caption = 'Peek 16'; DataClassification = CustomerContent; }
+        field(126; "Peek 17"; Text[50]) { Caption = 'Peek 17'; DataClassification = CustomerContent; }
+        field(127; "Peek 18"; Text[50]) { Caption = 'Peek 18'; DataClassification = CustomerContent; }
+        field(128; "Peek 19"; Text[50]) { Caption = 'Peek 19'; DataClassification = CustomerContent; }
+        field(129; "Peek 20"; Text[50]) { Caption = 'Peek 20'; DataClassification = CustomerContent; }
 
-
+        field(555; "Reload Page"; Boolean)
+        {
+            Caption = 'Reload Page';
+        }
 
         field(666; "Tile Group Code Filter"; Code[20])
         {

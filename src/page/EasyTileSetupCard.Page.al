@@ -133,7 +133,7 @@ page 80105 "Easy Tile Setup Card"
 
                 group(DrillDown)
                 {
-                    Caption = 'DrillDown';
+                    Caption = 'On Click';
 
                     field("Object Type"; Rec."Object Type")
                     {
@@ -150,8 +150,15 @@ page 80105 "Easy Tile Setup Card"
                 }
 
             }
+            part(Styles; "Easy Tile Grp. Line St. PP S8L")
+            {
+                ApplicationArea = all;
+                Caption = 'Style';
+                SubPageLink = "Tile Group Code" = field("Tile Group Code"), "Tile Position" = field("Tile Position"), "User Security Id" = field("User Security Id");
+            }
             group(Style)
             {
+                Visible = false;
                 Caption = 'Style';
                 field("Icon SVG Code"; Rec."Icon SVG Code")
                 {

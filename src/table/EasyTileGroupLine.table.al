@@ -1,20 +1,18 @@
 table 80102 "Easy Tile Group Line"
 {
     Caption = 'Easy Tile Group Line';
-    DataClassification = ToBeClassified;
+    DataClassification = CustomerContent;
     DataCaptionFields = Caption;
     fields
     {
         field(1; "Tile Group Code"; Code[20])
         {
             Caption = 'Tile Group Code ';
-            DataClassification = CustomerContent;
             TableRelation = "Easy Tile Group";
         }
         field(3; "Tile Position"; Integer)
         {
             Caption = 'Tile Position';
-            DataClassification = ToBeClassified;
             MinValue = 1;
             MaxValue = 20;
         }
@@ -22,25 +20,21 @@ table 80102 "Easy Tile Group Line"
         field(4; "User Security Id"; Guid)
         {
             Caption = 'User Security Id';
-            DataClassification = CustomerContent;
             TableRelation = User."User Security ID";
         }
         field(5; Caption; Text[250])
         {
             Caption = 'Caption';
-            DataClassification = CustomerContent;
         }
         field(6; "Visible"; Boolean)
         {
             Caption = 'Visible';
-            DataClassification = CustomerContent;
             InitValue = true;
         }
 
         field(10; "Object Type"; Option)
         {
             Caption = 'Object Type';
-            DataClassification = CustomerContent;
             OptionMembers = ,Page,Report,Codeunit,"XML Port";
             OptionCaption = ' ,Page,Report,Codeunit,XML Port';
             trigger OnValidate()
@@ -52,7 +46,6 @@ table 80102 "Easy Tile Group Line"
         field(11; "Object Id"; Integer)
         {
             Caption = 'Object Id';
-            DataClassification = CustomerContent;
             BlankZero = true;
             trigger OnValidate()
             var
@@ -117,7 +110,6 @@ table 80102 "Easy Tile Group Line"
         field(12; "Object Caption"; Text[249])
         {
             Caption = 'Object Caption';
-            DataClassification = CustomerContent;
             Editable = false;
         }
 

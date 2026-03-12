@@ -36,6 +36,7 @@ codeunit 80100 "Easy Tile Functions"
         GroupTileCount: array[4] of Integer;
         tilebackgroundcolour: Text;
         tilefontcolour: Text;
+        PeekText: Text[50];
     begin
         TileGroupId := TempEasyTileBuffer."Tile Group Position";
         EditMode := TempEasyTileBuffer."Edit Mode";
@@ -136,7 +137,7 @@ codeunit 80100 "Easy Tile Functions"
                 tilefontcolour := '';
 
                 if EasyTileGroupLine.Visible and (not EditMode) then
-                    CalcTileValues(TempEasyTileBuffer, RefPosition, RefStyle, RefValue);
+                    CalcTileValues(TempEasyTileBuffer, RefPosition, RefStyle, RefValue, PeekText);
 
                 if EditMode and EasyTileGroupLine.Visible then begin
                     RefStyle := 'Favorable';
@@ -154,7 +155,7 @@ codeunit 80100 "Easy Tile Functions"
                     EasyTileGroupLine.Caption := EmptyCaptionTxt;
                 end;
 
-                SetTileBufferValues(TempEasyTileBuffer, RefPosition, EasyTileGroupLine.Caption, EasyTileGroupLine.Visible, RefStyle, RefValue);
+                SetTileBufferValues(TempEasyTileBuffer, RefPosition, EasyTileGroupLine.Caption, EasyTileGroupLine.Visible, RefStyle, RefValue, PeekText);
 
                 if EasyTileGroup.Layout = EasyTileGroup.Layout::"2x10" then begin
                     if EasyTileGroupLine."Tile Position" <= 10 then
@@ -198,32 +199,45 @@ codeunit 80100 "Easy Tile Functions"
         OnAfterGenerateTileBuffer(UserId, TileGroupId, EditMode, TempEasyTileBuffer, Caption);
     end;
 
-    local procedure CalcTileValues(var TempEasyTileBuffer: Record "Easy Tile Buffer"; TilePosition: Integer; var RefStyle: Text; var RefValue: Decimal)
+    local procedure CalcTileValues(var TempEasyTileBuffer: Record "Easy Tile Buffer"; TilePosition: Integer; var RefStyle: Text; var RefValue: Decimal; var PeekText: text[50])
     var
         EasyTileGroupLine: Record "Easy Tile Group Line";
+        InValue: Decimal;
         isHandled: Boolean;
+        tilebackgroundcolour: Text;
+        tilefontcolour: Text;
+        hidecounter: Boolean;
+        iconsvg: Text;
+
+        Size: Enum "Easy Tile Size S8L";
+        outcaption: Text;
     begin
         OnBeforeCalcTileValues(TempEasyTileBuffer, TilePosition, RefStyle, RefValue, isHandled);
         if isHandled then
             exit;
 
-        if GetTileDefinition(TempEasyTileBuffer, TilePosition, EasyTileGroupLine) then
-            if not CalcTileValue(EasyTileGroupLine, RefValue) then exit; //add some error handling!
+        if GetTileDefinition(TempEasyTileBuffer, TilePosition, EasyTileGroupLine, InValue, PeekText) then
+            if not CalcTileValue(EasyTileGroupLine, RefValue) then begin
+                PeekText := '!Ref';
+                exit; //add some error handling!
+            end;
 
         isHandled := false;
         OnBeforeFindTileStyle(EasyTileGroupLine, RefValue, RefStyle, isHandled);
         if isHandled then
             exit;
 
+        GetTileStyle(TempEasyTileBuffer, TilePosition, tilebackgroundcolour, tilefontcolour, hidecounter, iconsvg, Size, outcaption, RefStyle, PeekText);
+
         //Style evaluation
-        if RefValue < EasyTileGroupLine."Threshold 1" then
-            RefStyle := ConvertStyleToStyleText(EasyTileGroupLine."Low Range Style");
+        // if RefValue < EasyTileGroupLine."Threshold 1" then
+        //     RefStyle := ConvertStyleToStyleText(EasyTileGroupLine."Low Range Style");
 
-        if (RefValue >= EasyTileGroupLine."Threshold 1") and (RefValue <= EasyTileGroupLine."Threshold 2") then
-            RefStyle := ConvertStyleToStyleText(EasyTileGroupLine."Middle Range Style");
+        // if (RefValue >= EasyTileGroupLine."Threshold 1") and (RefValue <= EasyTileGroupLine."Threshold 2") then
+        //     RefStyle := ConvertStyleToStyleText(EasyTileGroupLine."Middle Range Style");
 
-        if RefValue > EasyTileGroupLine."Threshold 2" then
-            RefStyle := ConvertStyleToStyleText(EasyTileGroupLine."High Range Style");
+        // if RefValue > EasyTileGroupLine."Threshold 2" then
+        //     RefStyle := ConvertStyleToStyleText(EasyTileGroupLine."High Range Style");
     end;
 
 
@@ -275,37 +289,45 @@ codeunit 80100 "Easy Tile Functions"
     internal procedure OnClick(var TempEasyTileBuffer: Record "Easy Tile Buffer"; TilePosition: Integer; var style: Text)
     var
         EasyTileGroupLine: Record "Easy Tile Group Line";
+        xEasyTileGroupLine: Record "Easy Tile Group Line";
         xMoveEasyTileGroupLine: Record "Easy Tile Group Line";
         EasyTilesFilterMgtSG: Codeunit "Easy Tiles Filter Mgt.SG";
         recref: RecordRef;
         fldref: FieldRef;
         recrefopen: Boolean;
         varrecref: Variant;
+        RefValue: Decimal;
         ImportQst: Label 'Import ?';
+        PeekText: Text[50];
         IsHandled: Boolean;
     begin
         OnBeforeOnclick(TempEasyTileBuffer, TilePosition, style, IsHandled);
         if IsHandled then
             exit;
 
-        if GetTileDefinition(TempEasyTileBuffer, TilePosition, EasyTileGroupLine) then begin
+        if GetTileDefinition(TempEasyTileBuffer, TilePosition, EasyTileGroupLine, RefValue, PeekText) then begin
             if TempEasyTileBuffer."Edit Mode" then begin
                 if TempEasyTileBuffer."Move Mode" and EasyTileGroupLine.Visible then begin
                     if TempEasyTileBuffer."Tile To Move" <> 0 then begin
-                        GetTileDefinition(TempEasyTileBuffer, TempEasyTileBuffer."Tile To Move", xMoveEasyTileGroupLine);
-                        SetTileBufferValues(TempEasyTileBuffer, TempEasyTileBuffer."Tile To Move", xMoveEasyTileGroupLine.Caption, true, 'Favorable', 1)
+                        GetTileDefinition(TempEasyTileBuffer, TempEasyTileBuffer."Tile To Move", xMoveEasyTileGroupLine, RefValue, PeekText);
+                        SetTileBufferValues(TempEasyTileBuffer, TempEasyTileBuffer."Tile To Move", xMoveEasyTileGroupLine.Caption, true, 'Favorable', 1, '')
                     end;
 
                     TempEasyTileBuffer."Tile To Move" := TilePosition;
-                    SetTileBufferValues(TempEasyTileBuffer, TilePosition, EasyTileGroupLine.Caption, true, 'Ambiguous', 999);
+                    SetTileBufferValues(TempEasyTileBuffer, TilePosition, EasyTileGroupLine.Caption, true, 'Ambiguous', 999, '');
                     style := 'Ambiguous';
                     TempEasyTileBuffer.Modify();
                 end else begin
+                    xEasyTileGroupLine := EasyTileGroupLine;
                     if Page.RunModal(Page::"Easy Tile Setup Card", EasyTileGroupLine) = Action::LookupOK then begin
-                        if EasyTileGroupLine.Visible then
-                            SetTileBufferValues(TempEasyTileBuffer, TilePosition, EasyTileGroupLine.Caption, true, 'Unfavorable', 1)
-                        else
-                            SetTileBufferValues(TempEasyTileBuffer, TilePosition, EmptyCaptionTxt, true, 'Unfavorable', 0);
+                        if EasyTileGroupLine.Visible then begin
+                            SetTileBufferValues(TempEasyTileBuffer, TilePosition, EasyTileGroupLine.Caption, true, 'Unfavorable', 1, '');
+                            if (xEasyTileGroupLine."Hide Counter" <> EasyTileGroupLine."Hide Counter") then
+                                TempEasyTileBuffer."Reload Page" := true;
+                            if (xEasyTileGroupLine.Size = xEasyTileGroupLine.Size::Large) and (xEasyTileGroupLine.Size <> EasyTileGroupLine.Size) then
+                                TempEasyTileBuffer."Reload Page" := true;
+                        end else
+                            SetTileBufferValues(TempEasyTileBuffer, TilePosition, EmptyCaptionTxt, true, 'Unfavorable', 0, '');
                         style := 'Unfavorable';
                         TempEasyTileBuffer.Modify();
                     end;
@@ -364,11 +386,114 @@ codeunit 80100 "Easy Tile Functions"
         end;
     end;
 
-    internal procedure GetTileDefinition(EasyTileBuffer: Record "Easy Tile Buffer" temporary; TilePosition: Integer; var EasyTileGroupLine: Record "Easy Tile Group Line"): Boolean;
+    internal procedure GetTileDefinition(EasyTileBuffer: Record "Easy Tile Buffer" temporary; TilePosition: Integer; var EasyTileGroupLine: Record "Easy Tile Group Line"; var RefValue: Decimal; var PeekText: Text[50]): Boolean;
     var
         recref: RecordRef;
         fldref: FieldRef;
     begin
+        case TilePosition of
+            1:
+                begin
+                    RefValue := EasyTileBuffer."Value 1";
+                    PeekText := EasyTileBuffer."Peek 1";
+                end;
+            2:
+                begin
+                    RefValue := EasyTileBuffer."Value 2";
+                    PeekText := EasyTileBuffer."Peek 2";
+                end;
+            3:
+                begin
+                    RefValue := EasyTileBuffer."Value 3";
+                    PeekText := EasyTileBuffer."Peek 3";
+                end;
+            4:
+                begin
+                    RefValue := EasyTileBuffer."Value 4";
+                    PeekText := EasyTileBuffer."Peek 4";
+                end;
+            5:
+                begin
+                    RefValue := EasyTileBuffer."Value 5";
+                    PeekText := EasyTileBuffer."Peek 5";
+                end;
+            6:
+                begin
+                    RefValue := EasyTileBuffer."Value 6";
+                    PeekText := EasyTileBuffer."Peek 6";
+                end;
+            7:
+                begin
+                    RefValue := EasyTileBuffer."Value 7";
+                    PeekText := EasyTileBuffer."Peek 7";
+                end;
+            8:
+                begin
+                    RefValue := EasyTileBuffer."Value 8";
+                    PeekText := EasyTileBuffer."Peek 8";
+                end;
+            9:
+                begin
+                    RefValue := EasyTileBuffer."Value 9";
+                    PeekText := EasyTileBuffer."Peek 9";
+                end;
+            10:
+                begin
+                    RefValue := EasyTileBuffer."Value 10";
+                    PeekText := EasyTileBuffer."Peek 10";
+                end;
+            11:
+                begin
+                    RefValue := EasyTileBuffer."Value 11";
+                    PeekText := EasyTileBuffer."Peek 11";
+                end;
+            12:
+                begin
+                    RefValue := EasyTileBuffer."Value 12";
+                    PeekText := EasyTileBuffer."Peek 12";
+                end;
+            13:
+                begin
+                    RefValue := EasyTileBuffer."Value 13";
+                    PeekText := EasyTileBuffer."Peek 13";
+                end;
+            14:
+                begin
+                    RefValue := EasyTileBuffer."Value 14";
+                    PeekText := EasyTileBuffer."Peek 14";
+                end;
+            15:
+                begin
+                    RefValue := EasyTileBuffer."Value 15";
+                    PeekText := EasyTileBuffer."Peek 15";
+                end;
+            16:
+                begin
+                    RefValue := EasyTileBuffer."Value 16";
+                    PeekText := EasyTileBuffer."Peek 16";
+                end;
+            17:
+                begin
+                    RefValue := EasyTileBuffer."Value 17";
+                    PeekText := EasyTileBuffer."Peek 17";
+                end;
+            18:
+                begin
+                    RefValue := EasyTileBuffer."Value 18";
+                    PeekText := EasyTileBuffer."Peek 18";
+                end;
+            19:
+                begin
+                    RefValue := EasyTileBuffer."Value 19";
+                    PeekText := EasyTileBuffer."Peek 19";
+                end;
+            20:
+                begin
+                    RefValue := EasyTileBuffer."Value 20";
+                    PeekText := EasyTileBuffer."Peek 20";
+                end;
+        end;
+
         EasyTileGroupLine.SetRange("Tile Group Code", EasyTileBuffer."Tile Group Code");
         EasyTileGroupLine.SetRange("Tile Position", TilePosition);
         EasyTileGroupLine.SetRange("User Security Id", UserSecurityId());
@@ -377,34 +502,47 @@ codeunit 80100 "Easy Tile Functions"
             exit(EasyTileGroupLine.FindFirst());
         end;
 
+
+
+
         exit(true);
 
     end;
 
-    internal procedure GetTileStyle(EasyTileBuffer: Record "Easy Tile Buffer" temporary; TilePosition: Integer; var tilebackgroundcolour: text; var tilefontcolour: text; var hidecounter: Boolean; var iconsvg: text; var Size: Enum "Easy Tile Size S8L"; var outcaption: text): Boolean
+    internal procedure GetTileStyle(EasyTileBuffer: Record "Easy Tile Buffer" temporary; TilePosition: Integer; var tilebackgroundcolour: text; var tilefontcolour: text; var hidecounter: Boolean; var iconsvg: text; var Size: Enum "Easy Tile Size S8L"; var outcaption: text; var outstyle: Text; var PeekText: Text[50]): Boolean
     var
         EasyTileGroupLine: Record "Easy Tile Group Line";
         EasyTileSVGHeader: Record "Easy Tile SVG Header";
+        EasyTileGroupLineStyle: Record "Easy Tile Group Line Style S8L";
         EasyTileSVGManagement: Codeunit "Easy Tile SVG Management";
         Visible: Boolean;
         Style: text;
-        Value: Decimal;
+        RefValue: Decimal;
     begin
         outcaption := '';
         tilefontcolour := '';
         tilebackgroundcolour := '';
         hidecounter := false;
         iconsvg := '';
+        outstyle := '';
+        PeekText := '';
 
-        if GetTileDefinition(EasyTileBuffer, TilePosition, EasyTileGroupLine) then begin
-            tilebackgroundcolour := EasyTileGroupLine."Tile Background Colour";
-            tilefontcolour := EasyTileGroupLine."Tile Font Colour";
+        if GetTileDefinition(EasyTileBuffer, TilePosition, EasyTileGroupLine, RefValue, PeekText) then begin
             hidecounter := EasyTileGroupLine."Hide Counter";
             Size := EasyTileGroupLine.Size;
             outcaption := EasyTileGroupLine.Caption;
-            if EasyTileSVGHeader.Get(EasyTileGroupLine."Icon SVG Code") then
-                iconsvg := EasyTileSVGManagement.CreateSVG(EasyTileSVGHeader, '40', '40'); //icon size limit to 40x40
 
+            EasyTileGroupLineStyle.SetRange("Tile Group Code", EasyTileGroupLine."Tile Group Code");
+            EasyTileGroupLineStyle.SetRange("Tile Position", EasyTileGroupLine."Tile Position");
+            EasyTileGroupLineStyle.SetRange("User Security Id", EasyTileGroupLine."User Security Id");
+            EasyTileGroupLineStyle.SetFilter(Value, '<=%1', RefValue);
+            if EasyTileGroupLineStyle.FindLast() then begin
+                tilebackgroundcolour := EasyTileGroupLineStyle."Tile Background Colour";
+                tilefontcolour := EasyTileGroupLineStyle."Tile Font Colour";
+                outstyle := ConvertStyleToStyleText(EasyTileGroupLineStyle."Tile Style");
+                if EasyTileSVGHeader.Get(EasyTileGroupLineStyle."Icon SVG Code") then
+                    iconsvg := EasyTileSVGManagement.CreateSVG(EasyTileSVGHeader, '40', '40'); //icon size limit to 40x40
+            end;
             exit((hidecounter or (tilebackgroundcolour <> '') or (tilefontcolour <> '') or (iconsvg <> '') or (Size = Size::Normal) or (Size <> Size::Normal)) and (EasyTileGroupLine.Visible)); //this will trigger always
         end;
     end;
@@ -436,7 +574,7 @@ codeunit 80100 "Easy Tile Functions"
 
     end;
 
-    local procedure SetTileBufferValues(var TempEasyTileBuffer: Record "Easy Tile Buffer" temporary; TilePosition: Integer; Caption: Text; Visible: Boolean; Style: text; Value: Decimal)
+    local procedure SetTileBufferValues(var TempEasyTileBuffer: Record "Easy Tile Buffer" temporary; TilePosition: Integer; Caption: Text; Visible: Boolean; Style: text; Value: Decimal; Peek: Text[50])
     var
         recref: RecordRef;
         fldref: FieldRef;
@@ -462,6 +600,9 @@ codeunit 80100 "Easy Tile Functions"
         fldref := recref.Field(TilePosition + 89);
         fldref.Value(Value);
 
+        //Peek + 109
+        fldref := recref.Field(TilePosition + 109);
+        fldref.Value(Peek);
 
         recref.SetTable(TempEasyTileBuffer);
     end;

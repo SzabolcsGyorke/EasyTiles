@@ -832,6 +832,17 @@ page 80101 "Easy Tile Activities"
             AdminAccess := UserSetup."EasyTile Admin SG";
     end;
 
+    trigger OnClosePage()
+    var
+        sessionSetting: SessionSettings;
+    begin
+        if Rec."Edit Mode" then begin
+            if Rec."Reload Page" then
+                sessionSetting.RequestSessionUpdate(true);
+
+        end;
+    end;
+
     local procedure MoveTile(Direction: Integer)
     var
         EasyTileGroupLine: Record "Easy Tile Group Line";
@@ -904,6 +915,7 @@ page 80101 "Easy Tile Activities"
     var
         recref: RecordRef;
         fldref: FieldRef;
+        style: Text;
         tilebackgroundcolour: Text;
         tilefontcolour: Text;
         hidecounter: Boolean;
@@ -914,6 +926,7 @@ page 80101 "Easy Tile Activities"
         iconsvg: Text;
         size: enum "Easy Tile Size S8L";
         caption: text;
+        PeekText: Text[50];
     begin
         Visible1 := Rec."Visible 1";
         Visible2 := Rec."Visible 2";
@@ -976,8 +989,8 @@ page 80101 "Easy Tile Activities"
 
                     tilegroup := 2;
                 end;
-                if EasyTileFunctions.GetTileStyle(Rec, i, tilebackgroundcolour, tilefontcolour, hidecounter, iconsvg, size, caption) then
-                    CurrPage.TileController.EditTile(controlid2, tilegroup, tiledisplayid, hidecounter, '', '', tilebackgroundcolour, tilefontcolour, iconsvg, Format(size), caption);
+                if EasyTileFunctions.GetTileStyle(Rec, i, tilebackgroundcolour, tilefontcolour, hidecounter, iconsvg, size, caption, style, PeekText) then
+                    CurrPage.TileController.EditTile(controlid2, tilegroup, tiledisplayid, hidecounter, PeekText, '', tilebackgroundcolour, tilefontcolour, iconsvg, Format(size), caption);
             end;
 
             if layout = layout::"4x5" then begin
@@ -1007,8 +1020,8 @@ page 80101 "Easy Tile Activities"
                         tiledisplayid += 1;
                     tilegroup := 4;
                 end;
-                if EasyTileFunctions.GetTileStyle(Rec, i, tilebackgroundcolour, tilefontcolour, hidecounter, iconsvg, size, caption) then
-                    CurrPage.TileController.EditTile(controlid2, tilegroup, tiledisplayid, hidecounter, '', '', tilebackgroundcolour, tilefontcolour, iconsvg, Format(size), caption);
+                if EasyTileFunctions.GetTileStyle(Rec, i, tilebackgroundcolour, tilefontcolour, hidecounter, iconsvg, size, caption, style, PeekText) then
+                    CurrPage.TileController.EditTile(controlid2, tilegroup, tiledisplayid, hidecounter, PeekText, '', tilebackgroundcolour, tilefontcolour, iconsvg, Format(size), caption);
             end;
 
 
