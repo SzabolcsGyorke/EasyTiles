@@ -847,15 +847,30 @@ page 80101 "Easy Tile Activities"
     var
         EasyTileGroupLine: Record "Easy Tile Group Line";
         MEasyTileGroupLine: Record "Easy Tile Group Line";
+        EasyTileGroupLineStyle: Record "Easy Tile Group Line Style S8L";
+        MEasyTileGroupLineStyle: Record "Easy Tile Group Line Style S8L";
         TempEasyTileGroupLine: Record "Easy Tile Group Line" temporary;
+        TempEasyTileGroupLineStyle: Record "Easy Tile Group Line Style S8L" temporary;
         EmptyGuid: Guid;
     begin
         EasyTileGroupLine.Get(Rec."Tile Group Code", Rec."Tile To Move", EmptyGuid);
         EasyTileGroupLine.CalcFields("Table Filter");
+        //Save the tile replaced to temp
         TempEasyTileGroupLine.Init();
         TempEasyTileGroupLine := EasyTileGroupLine;
         TempEasyTileGroupLine.Insert();
 
+        EasyTileGroupLineStyle.SetRange("Tile Group Code", TempEasyTileGroupLine."Tile Group Code");
+        EasyTileGroupLineStyle.SetRange("User Security Id", TempEasyTileGroupLine."User Security Id");
+        EasyTileGroupLineStyle.SetRange("Tile Position", TempEasyTileGroupLine."Tile Position");
+        if EasyTileGroupLineStyle.FindSet() then
+            repeat
+                TempEasyTileGroupLineStyle.Init();
+                TempEasyTileGroupLineStyle := EasyTileGroupLineStyle;
+                TempEasyTileGroupLineStyle.Insert();
+            until EasyTileGroupLineStyle.Next() = 0;
+
+        //replace the new position with the old
         MEasyTileGroupLine.Get(Rec."Tile Group Code", Rec."Tile To Move" + Direction, EmptyGuid);
         MEasyTileGroupLine.CalcFields("Table Filter");
         EasyTileGroupLine.Delete();
@@ -864,11 +879,34 @@ page 80101 "Easy Tile Activities"
         EasyTileGroupLine."Tile Position" := Rec."Tile To Move";
         EasyTileGroupLine.Insert();
 
+        EasyTileGroupLineStyle.SetRange("Tile Group Code", MEasyTileGroupLine."Tile Group Code");
+        EasyTileGroupLineStyle.SetRange("User Security Id", MEasyTileGroupLine."User Security Id");
+        EasyTileGroupLineStyle.SetRange("Tile Position", MEasyTileGroupLine."Tile Position");
+        if EasyTileGroupLineStyle.FindSet() then
+            repeat
+                MEasyTileGroupLineStyle.Init();
+                MEasyTileGroupLineStyle := EasyTileGroupLineStyle;
+                MEasyTileGroupLineStyle."Tile Position" := Rec."Tile To Move";
+                EasyTileGroupLineStyle.Delete();
+                MEasyTileGroupLineStyle.Insert();
+            until EasyTileGroupLineStyle.Next() = 0;
+
+
+        //move the tile to the new position from temp
         MEasyTileGroupLine.Delete();
         MEasyTileGroupLine.Init();
         MEasyTileGroupLine := TempEasyTileGroupLine;
         MEasyTileGroupLine."Tile Position" := Rec."Tile To Move" + Direction;
         MEasyTileGroupLine.Insert();
+
+        if TempEasyTileGroupLineStyle.FindSet() then
+            repeat
+                MEasyTileGroupLineStyle.Init();
+                MEasyTileGroupLineStyle := TempEasyTileGroupLineStyle;
+                MEasyTileGroupLineStyle."Tile Position" := MEasyTileGroupLine."Tile Position";
+                EasyTileGroupLineStyle.Delete();
+                MEasyTileGroupLineStyle.Insert();
+            until TempEasyTileGroupLineStyle.Next() = 0;
 
         Rec."Tile To Move" += Direction;
         Rec.Modify();
